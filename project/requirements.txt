@@ -1,0 +1,12 @@
+# PaddleOCR 依赖（.venv 用）
+# 注：原版是从乱装的旧 venv pip freeze 出来的，混入了 numpy>=2 的包
+# （opencv-headless 5.0 / pandas 3.0 / scipy 1.17 / scikit-image 0.26），
+# 和 paddlepaddle 2.6.2 要的 numpy==1.26.4 冲突，装不上。
+# 这里只钉关键版本，其余依赖让 pip 在 numpy<2 约束下自己解析兼容版本。
+# 原始 84 包清单见 venv_frozen.txt。
+paddleocr==2.7.3
+paddlepaddle==2.6.2
+numpy<2
+protobuf==3.20.2
+pymupdf==1.28.0
+pdf2docx==0.5.13
