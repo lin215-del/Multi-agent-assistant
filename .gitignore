@@ -26,6 +26,7 @@ desktop.ini
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
 # 课程下发的参考材料（通知/模板/课件 PDF，非项目代码，不入库）
 2026年实习通知及教学填写材料/
