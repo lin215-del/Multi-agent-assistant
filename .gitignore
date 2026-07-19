@@ -32,5 +32,4 @@ __pycache__/
 2026年实习通知及教学填写材料/
 project/第*.pdf
 
-# 数据清洗的原始输入（教材 PDF 等，可能含版权；只留本地，仅提交 cleaned/ 产出）
-project/data_cleaning/raw/
+# raw/ 爬虫原料已全量入库（jwc 公开网页 + 附件，留底可复现）
