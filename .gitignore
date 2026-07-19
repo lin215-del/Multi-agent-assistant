@@ -22,6 +22,11 @@ desktop.ini
 # Claude local settings (per-machine, not shared)
 .claude/settings.local.json
 
+# Env / API keys（绝不提交，但 .env.example 模板入库）
+.env
+.env.*
+!.env.example
+
 # Python cache
 __pycache__/
 *.py[cod]
