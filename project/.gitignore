@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# 虚拟环境
+.venv/
+.venv-mineru/
+venv/
+
+# MinerU 输出（可再生产物 + PDF 输入样本 + 图片，不入库）
+data_cleaning/mineru_output/
+
+# OS
+.DS_Store
+Thumbs.db

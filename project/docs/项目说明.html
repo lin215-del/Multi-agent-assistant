@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>暨大学生问答助手 · 项目说明</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    line-height: 1.7; color: #1f2937; background: #f6f7f9;
+    margin: 0; padding: 40px 20px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 40px; }
+  header h1 { font-size: 2.1em; margin: 0 0 8px; color: #111827; }
+  header .sub { color: #6b7280; font-size: 1.05em; }
+  header .meta { margin-top: 14px; color: #9ca3af; font-size: 0.9em; }
+  .card {
+    background: #fff; border-radius: 10px; padding: 26px 30px;
+    margin-bottom: 22px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  h2 { font-size: 1.35em; border-left: 4px solid #2563eb; padding-left: 12px; margin-top: 0; }
+  h3 { font-size: 1.05em; margin: 18px 0 8px; color: #374151; }
+  p { margin: 10px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.95em; }
+  th, td { border: 1px solid #e5e7eb; padding: 9px 12px; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 11px; font-size: 0.78em; font-weight: 600; }
+  .mvp { background: #dbeafe; color: #1e40af; }
+  .plus { background: #fef3c7; color: #92400e; }
+  .stack { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+  .layer {
+    background: linear-gradient(90deg, #eff6ff, #fff); border: 1px solid #bfdbfe;
+    border-radius: 8px; padding: 14px 18px;
+  }
+  .layer .name { font-weight: 700; color: #1e40af; font-size: 1.05em; }
+  .layer .desc { color: #4b5563; font-size: 0.92em; margin-top: 3px; }
+  .arrow { text-align: center; color: #9ca3af; font-size: 1.3em; line-height: 1; }
+  .flow {
+    background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 8px;
+    padding: 16px; font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.88em; white-space: pre; overflow-x: auto; color: #374151;
+  }
+  .agents { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 14px 0; }
+  .agent { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; }
+  .agent .role { font-weight: 700; color: #166534; }
+  .agent .job { font-size: 0.88em; color: #4b5563; margin-top: 4px; }
+  .done { color: #16a34a; font-weight: 600; }
+  .doing { color: #d97706; font-weight: 600; }
+  .todo { color: #9ca3af; }
+  footer { text-align: center; color: #9ca3af; font-size: 0.85em; margin-top: 30px; }
+  code { background: #f3f4f6; padding: 1px 6px; border-radius: 4px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>暨大学生问答助手</h1>
+  <div class="sub">基于 Docker + RAGFlow 的多智能体系统 · 实训方案 3（基于 Python 的 AI 应用开发）</div>
+  <div class="meta">暨南大学 2023 级本科毕业实习实训 · 计算机科学系 · 2026 年暑期</div>
+</header>
+
+<div class="card">
+  <h2>一、项目简介</h2>
+  <p>面向暨南大学本科生的<strong>教务办事智能问答助手</strong>。把教务处（jwc）公开的通知、办事指南、规章制度等文档，经多模态清洗后灌入 RAGFlow 知识库；学生用自然语言提问，系统经多智能体检索 + 二次包装，返回<strong>带来源引用</strong>的答案，检索不到时<strong>拒答</strong>而非胡编。</p>
+  <p>解决的核心痛点：教务信息分散在各种通知/规章/PDF 里，学生找答案费时；本系统把它们汇聚成一个"问得到、答得准、查得到出处"的助手。</p>
+</div>
+
+<div class="card">
+  <h2>二、功能清单</h2>
+  <h3>核心功能（MVP — 答辩主干）</h3>
+  <table>
+    <tr><th width="60">#</th><th>功能</th><th>说明</th></tr>
+    <tr><td><span class="badge mvp">MVP</span></td><td>学生问答</td><td>自然语言问教务问题（"怎么选课""奖学金怎么申请""挂科咋办"），系统检索后给答案</td></tr>
+    <tr><td><span class="badge mvp">MVP</span></td><td>来源溯源</td><td>每个答案标注"来自《xxx通知》2026-07-07 + 原文链接"，可点开核对（课件硬要求）</td></tr>
+    <tr><td><span class="badge mvp">MVP</span></td><td>多智能体后台</td><td>调度→检索→分析→反思，LangGraph 编排（课件核心）</td></tr>
+    <tr><td><span class="badge mvp">MVP</span></td><td>拒答机制</td><td>检索不到相关内容时明确告知，不胡编（可靠性，面试常问）</td></tr>
+    <tr><td><span class="badge mvp">MVP</span></td><td>知识库</td><td>jwc 公开文档清洗后入 RAGFlow，支持分块/向量/检索</td></tr>
+  </table>
+  <h3>加分功能（时间够再做）</h3>
+  <table>
+    <tr><td><span class="badge plus">加分</span></td><td>截图提问</td><td>传通知/表格截图 → PaddleOCR 识别 → 围绕截图问答（用户侧多模态）</td></tr>
+    <tr><td><span class="badge plus">加分</span></td><td>表格结构化呈现</td><td>学分表/收费/办理流程以表格清晰展示（用数据侧的表→JSON）</td></tr>
+    <tr><td><span class="badge plus">加分</span></td><td>错题讲解</td><td>拍错题 → 检索知识点 → 逐步讲解（往教辅延展）</td></tr>
+  </table>
+  <p style="font-size:.9em;color:#6b7280;">⚠ 受众暂定 = 本科生（可扩研究生）；前台暂定 = Streamlit/Gradio（Python，demo 快）。组里讨论后定。</p>
+</div>
+
+<div class="card">
+  <h2>三、系统架构（四层）</h2>
+  <div class="stack">
+    <div class="layer"><div class="name">④ 应用层</div><div class="desc">用户提问 → 接口（FastAPI）→ 答案 + 溯源链接展示（Streamlit/Gradio 前台）</div></div>
+    <div class="arrow">▲</div>
+    <div class="layer"><div class="name">③ 多智能体层（LangGraph）</div><div class="desc">调度 / 检索 / 分析 / 工具 / 反思 —— 任务规划、检索、调用工具、结果生成、错误检查</div></div>
+    <div class="arrow">▲</div>
+    <div class="layer"><div class="name">② 知识库层（RAGFlow）</div><div class="desc">上传资料 → 解析分块 → 向量化（bge-m3）→ 检索（top-k）</div></div>
+    <div class="arrow">▲</div>
+    <div class="layer"><div class="name">① 数据清洗层</div><div class="desc">爬虫采集 → HTML/PDF 多模态清洗（MineRU + Python，表转 JSON、可溯源）→ 入库</div></div>
+  </div>
+  <p style="font-size:.9em;color:#6b7280;">数据清洗是地基——课件原话："清洗不好，即便 RAGFlow 分块参数再好、多智能体再强，检索效果也会很差劲。"</p>
+</div>
+
+<div class="card">
+  <h2>四、数据流</h2>
+  <div class="flow"># 离线：数据采集 + 清洗 + 入库
+jwc 公开栏目（通知/办事指南/规章）
+   │  crawl_jwc.py（爬虫，静态栏目自动采）
+   ▼
+raw/（HTML + PDF 附件）
+   │  clean_html.py（HTML→markdown）
+   │  clean_pdf.py（PDF→MineRU→markdown + 表→JSON）   ← 进行中
+   ▼
+cleaned/（干净 markdown + 表格 JSON，带溯源 URL）
+   │  灌入 RAGFlow 知识库
+   ▼
+RAGFlow（分块 / bge-m3 向量 / 检索）
+
+# 在线：用户问答
+学生提问
+   │  FastAPI
+   ▼
+多智能体（LangGraph）：调度→检索→分析→反思
+   │            │
+   │            └─ 调 RAGFlow 拿 top-k → qwen2.5-7b 二次包装
+   ▼
+答案 + 来源引用（可点开核对）/ 检索不到则拒答</div>
+</div>
+
+<div class="card">
+  <h2>五、多智能体设计（LangGraph 编排）</h2>
+  <div class="agents">
+    <div class="agent"><div class="role">调度 Agent</div><div class="job">判断问题类型、路由到后续节点、控制停止条件</div></div>
+    <div class="agent"><div class="role">检索 Agent</div><div class="job">调用 RAGFlow 查资料，拿 top-k 分块</div></div>
+    <div class="agent"><div class="role">分析 Agent</div><div class="job">基于检索结果生成答案（qwen2.5-7b）</div></div>
+    <div class="agent"><div class="role">工具 Agent</div><div class="job">调用 OCR / 计算器等外部工具</div></div>
+    <div class="agent"><div class="role">反思 Agent</div><div class="job">检查答案可靠性、是否幻觉、要不要重试</div></div>
+  </div>
+  <p style="font-size:.9em;color:#6b7280;">LangGraph 核心概念：State（多 Agent 共享状态）/ Node（节点）/ Edge（执行顺序）/ Conditional Edge（条件分支）/ Checkpoint（断点恢复）。</p>
+</div>
+
+<div class="card">
+  <h2>六、技术栈</h2>
+  <table>
+    <tr><th>工具</th><th>本项目作用</th></tr>
+    <tr><td>Docker</td><td>部署 RAGFlow</td></tr>
+    <tr><td>RAGFlow</td><td>知识库 / 分块 / 向量检索（提供 RAG 增强）</td></tr>
+    <tr><td>MinerU</td><td>PDF / 图片 / 表格 / 公式解析（数据清洗第一步）</td></tr>
+    <tr><td>PaddleOCR</td><td>截图 / 图片文字识别（替代百度 OCR，免费本地）</td></tr>
+    <tr><td>硅基流动</td><td>大模型 + Embedding API</td></tr>
+    <tr><td>BAAI/bge-m3</td><td>向量模型（语义检索）</td></tr>
+    <tr><td>qwen2.5-7b-instruct</td><td>对话模型（分析 + 生成）</td></tr>
+    <tr><td>LangGraph</td><td>多智能体编排框架</td></tr>
+    <tr><td>FastAPI</td><td>后端接口</td></tr>
+    <tr><td>SQLite</td><td>保存记录 / 结果</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>七、当前进度（课件 8 步）</h2>
+  <table>
+    <tr><th>步</th><th>内容</th><th>状态</th></tr>
+    <tr><td>1</td><td>选题</td><td class="doing">🟡 方向=学生问答助手，细化中</td></tr>
+    <tr><td>2</td><td>明确功能</td><td class="doing">🟡 见上方功能清单（本文档）</td></tr>
+    <tr><td>3</td><td>RAGFlow 要解决的需求</td><td class="doing">🟡 教务信息检索 + 带溯源问答</td></tr>
+    <tr><td>4</td><td>准备数据集</td><td class="doing">🟡 jwc 公开栏目，已爬 2 个</td></tr>
+    <tr><td>5</td><td>数据清洗</td><td class="doing">🟡 HTML ✅ / PDF 表→JSON ✅ / 清洗管线 ⏳</td></tr>
+    <tr><td>6</td><td>搭建 RAGFlow 知识库</td><td class="done">✅ RAGFlow 已部署，待灌清洗结果</td></tr>
+    <tr><td>7</td><td>后台多智能体</td><td class="todo">⏳ 待做</td></tr>
+    <tr><td>8</td><td>前台展示</td><td class="todo">⏳ 待做</td></tr>
+  </table>
+  <h3>已完成的代码（git 跟踪）</h3>
+  <ul>
+    <li><code>crawl_jwc.py</code> — jwc 静态栏目爬虫（列表→详情→附件，礼貌延时，跳过登录系统）</li>
+    <li><code>clean_html.py</code> — HTML → markdown 清洗（抽正文 / 去导航 / 合并碎行 / 带溯源）</li>
+    <li><code>clean_tables.py</code> — HTML 表 → JSON（caption + headers + rows，处理 colspan 标题）</li>
+    <li>pytest <strong>25 个测试全绿</strong>（爬虫 13 + HTML 清洗 8 + 表→JSON 4），TDD</li>
+  </ul>
+  <h3>已采集数据（raw，本地不入库）</h3>
+  <ul>
+    <li>学生办事指南：9 篇（已清洗成 markdown）</li>
+    <li>通知：12 篇 + 15 个 PDF/Office 附件（含学科竞赛榜单、创新学分办法、获奖名单等）</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>八、ABSD 质量属性（答辩要点）</h2>
+  <table>
+    <tr><th>属性</th><th>本项目怎么体现</th></tr>
+    <tr><td>性能</td><td>Agent 调用链不能太长；RAG 检索 + Rerank 控制延迟；top-k 数量权衡</td></tr>
+    <tr><td>可靠性</td><td>某 Agent 失败兜底；RAGFlow 没结果时降级 / 拒答</td></tr>
+    <tr><td>安全性</td><td>Agent 工具权限控制；API Key / 用户数据保护</td></tr>
+    <tr><td>可修改性</td><td>模型 / RAGFlow / 单个 Agent 可替换（不用方案 4 那种 LangGraph 自带 RAG 反例）</td></tr>
+    <tr><td>可观测性</td><td>每个 Agent 的输入输出可追踪、错误能定位到节点</td></tr>
+  </table>
+</div>
+
+<footer>暨南大学 · 计算机科学系 · 2026 暑期集中实习实训 · 方案 3 · 项目说明文档</footer>
+
+</div>
+</body>
+</html>
