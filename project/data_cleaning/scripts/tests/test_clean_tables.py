@@ -125,3 +125,57 @@ def test_colspan_horizontal_fill():
     </table>"""
     result = table_to_json(html)
     assert result["rows"] == [{"A": "合并", "B": "合并", "C": "x"}]
+
+
+# ---------- 多级表头 / 无 rowspan 标记的层级表 ----------
+def test_short_header_row_not_treated_as_caption():
+    """行 cell 数少但没 colspan 占满整行时，不当 caption，表头取第一行。
+    复刻创新学分认定办法 table1：真表头(4cell)被误当 caption、数据首行(5cell)当表头。"""
+    html = """<table>
+      <tr><td>类别</td><td>学分</td><td>成绩</td></tr>
+      <tr><td>A1类</td><td>第一作者</td><td>2</td><td>98</td><td>依据</td></tr>
+      <tr><td>A2类</td><td>前三作者</td><td>2</td><td>95</td><td>依据</td></tr>
+    </table>"""
+    result = table_to_json(html)
+    assert result["caption"] == ""
+    assert result["headers"][:3] == ["类别", "学分", "成绩"]
+    assert "A1类" not in result["headers"]
+    assert len(result["rows"]) == 2
+
+
+def test_quality_unaligned_for_jagged_rows_without_rowspan():
+    """行宽不齐且无 rowspan 标记 → quality='unaligned'（MineRU 漏标 rowspan 的层级表）。"""
+    html = """<table>
+      <tr><td>类别</td><td>学分</td></tr>
+      <tr><td>A1</td><td>第一作者</td><td>2</td><td>98</td></tr>
+      <tr><td>第二作者</td><td>95</td></tr>
+    </table>"""
+    assert table_to_json(html)["quality"] == "unaligned"
+
+
+def test_quality_ok_for_aligned_and_rowspan_tables():
+    """正常对齐的表 + 有 rowspan 标记的表，quality 都应是 'ok'。"""
+    aligned = table_to_json("<table><tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr></table>")
+    assert aligned["quality"] == "ok"
+    rowspan = table_to_json(
+        "<table><tr><th>X</th></tr>"
+        "<tr><td rowspan='2'>1</td></tr><tr><td>2</td></tr></table>"
+    )
+    assert rowspan["quality"] == "ok"
+
+
+def test_multilevel_colspan_header_not_caption():
+    """表头有 colspan 合并（多级表头）占满整行时，不当 caption。
+    复刻创新学分认定办法 table1 真实结构：'类别及等级'colspan=2 占满，但它是表头不是 caption。
+    展开后重复列名要去重（.1），避免 dict 键冲突丢数据。"""
+    html = """<table>
+      <tr><td colspan="2">类别及等级</td><td>学分</td><td>成绩</td><td>认定依据</td></tr>
+      <tr><td>A1类</td><td>第一作者</td><td>2</td><td>98</td><td>依据</td></tr>
+    </table>"""
+    result = table_to_json(html)
+    assert result["caption"] == ""
+    assert result["headers"] == ["类别及等级", "类别及等级.1", "学分", "成绩", "认定依据"]
+    assert result["rows"][0] == {
+        "类别及等级": "A1类", "类别及等级.1": "第一作者",
+        "学分": "2", "成绩": "98", "认定依据": "依据",
+    }
