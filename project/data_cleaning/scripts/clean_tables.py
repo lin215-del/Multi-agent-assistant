@@ -7,31 +7,79 @@ import re
 from bs4 import BeautifulSoup
 
 
+def _parse_rows(table):
+    """<table> 的每个 <tr> → [[(text, rowspan, colspan), ...], ...]。空行丢弃。"""
+    rows = []
+    for tr in table.find_all("tr"):
+        cells = []
+        for c in tr.find_all(["td", "th"]):
+            try:
+                rs = max(int(c.get("rowspan", 1) or 1), 1)
+                cs = max(int(c.get("colspan", 1) or 1), 1)
+            except (ValueError, TypeError):
+                rs = cs = 1
+            cells.append((c.get_text(strip=True), rs, cs))
+        if cells:
+            rows.append(cells)
+    return rows
+
+
+def _expand_rows(rows, n_cols):
+    """展开 rowspan/colspan 成 n_cols 宽的二维表。
+    rowspan>1 的值向下填充到被合并的后续行；colspan>1 横向占多列。
+    pending[col] = [剩余 rowspan 数, 值]，记录某列接下来还要被上面哪个值占几行。"""
+    grid = []
+    pending = {}
+    for cells in rows:
+        row = [""] * n_cols
+        ci = 0
+        col = 0
+        while col < n_cols:
+            if col in pending:
+                row[col] = pending[col][1]
+                pending[col][0] -= 1
+                if pending[col][0] == 0:
+                    del pending[col]
+                col += 1
+            elif ci < len(cells):
+                text, rs, cs = cells[ci]
+                ci += 1
+                for k in range(cs):
+                    if col + k < n_cols:
+                        row[col + k] = text
+                        if rs > 1:
+                            pending[col + k] = [rs - 1, text]
+                col += cs
+            else:
+                col += 1
+        grid.append(row)
+    return grid
+
+
 def table_to_json(html):
     """HTML <table> 片段 → {"caption": ..., "headers": [...], "rows": [...]}。
-    - 表头行 = cell 数最多的那行（通常是真正的列头）
-    - 表头之前的行（cell 少、常是 colspan 占满的标题）合并成 caption
+    - 展开 rowspan（向下填充）/ colspan（横向填充），避免合并单元格错位
+    - 表头行 = cell 数最多的那行；之前的行（常是 colspan 占满的标题）合并成 caption
     - 其余行按表头转成 dict。空表返回空结构。"""
     soup = BeautifulSoup(html, "lxml")
     table = soup.find("table")
     empty = {"caption": "", "headers": [], "rows": []}
     if table is None:
         return empty
-    rows = table.find_all("tr")
+    rows = _parse_rows(table)
     if not rows:
         return empty
-    parsed = [[c.get_text(strip=True) for c in tr.find_all(["td", "th"])] for tr in rows]
-    parsed = [p for p in parsed if p]
-    if not parsed:
+    n_cols = max(sum(cs for _, _, cs in r) for r in rows)
+    if n_cols == 0:
         return empty
-    max_cells = max(len(p) for p in parsed)
-    header_idx = next(i for i, p in enumerate(parsed) if len(p) == max_cells)
-    caption = " ".join(c[0] for c in parsed[:header_idx] if c)
-    headers = parsed[header_idx]
-    data_rows = []
-    for cells in parsed[header_idx + 1:]:
-        n = min(len(headers), len(cells))
-        data_rows.append({headers[i]: cells[i] for i in range(n)})
+    grid = _expand_rows(rows, n_cols)
+    cell_counts = [len(r) for r in rows]
+    max_cells = max(cell_counts)
+    header_idx = next(i for i, n in enumerate(cell_counts) if n == max_cells)
+    caption = " ".join(text for r in rows[:header_idx] for (text, _, _) in r if text)
+    headers = grid[header_idx]
+    data_rows = [{headers[i]: gr[i] for i in range(len(headers))}
+                 for gr in grid[header_idx + 1:]]
     return {"caption": caption, "headers": headers, "rows": data_rows}
 
 

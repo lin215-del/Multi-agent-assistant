@@ -77,3 +77,51 @@ def test_extract_finds_multiple_tables():
 
 def test_extract_returns_empty_when_no_table():
     assert extract_tables_from_markdown("纯文字，没有表") == []
+
+
+# ---------- rowspan / colspan 展开 ----------
+def test_rowspan_value_filled_downward():
+    """rowspan>1 的单元格，其值要向下填充到被合并的后续行。
+    不展开的话，后续行 cell 数 < 表头，列会错位。"""
+    html = """<table>
+      <tr><th>序号</th><th>名称</th><th>子项</th><th>分类</th></tr>
+      <tr><td rowspan="2">1</td><td rowspan="2">外研社</td><td>演讲</td><td>语言</td></tr>
+      <tr><td>辩论</td><td>语言</td></tr>
+      <tr><td>2</td><td>数学建模</td><td>数学建模</td><td>理学</td></tr>
+    </table>"""
+    result = table_to_json(html)
+    assert result["headers"] == ["序号", "名称", "子项", "分类"]
+    assert result["rows"] == [
+        {"序号": "1", "名称": "外研社", "子项": "演讲", "分类": "语言"},
+        {"序号": "1", "名称": "外研社", "子项": "辩论", "分类": "语言"},
+        {"序号": "2", "名称": "数学建模", "子项": "数学建模", "分类": "理学"},
+    ]
+
+
+def test_rowspan_mineru_redundant_attrs():
+    """MineRU 真实输出：每个 td 都带 colspan/rowspan 属性（哪怕是 1），
+    且相邻多列可能同时 rowspan（如'序号'+'竞赛名称'一起跨行）。
+    复刻 test_ranking.pdf 序号15 那段的真实 HTML 结构。"""
+    html = """<table>
+      <tr><td colspan="1" rowspan="1">序号</td><td colspan="1" rowspan="1">竞赛名称（总）</td><td colspan="1" rowspan="1">竞赛名称（子赛）</td><td colspan="1" rowspan="1">竞赛分类</td></tr>
+      <tr><td colspan="1" rowspan="2">15</td><td colspan="1" rowspan="2">外研社全国大学生英语系列赛</td><td colspan="1" rowspan="1">英语演讲赛</td><td colspan="1" rowspan="1">语言类</td></tr>
+      <tr><td colspan="1" rowspan="1">英语辩论赛</td><td colspan="1" rowspan="1">语言类</td></tr>
+      <tr><td colspan="1" rowspan="1">16</td><td colspan="1" rowspan="1">全国职业院校技能大赛</td><td colspan="1" rowspan="1">全国职业院校技能大赛</td><td colspan="1" rowspan="1">职业技能类</td></tr>
+    </table>"""
+    result = table_to_json(html)
+    assert result["headers"] == ["序号", "竞赛名称（总）", "竞赛名称（子赛）", "竞赛分类"]
+    assert result["rows"] == [
+        {"序号": "15", "竞赛名称（总）": "外研社全国大学生英语系列赛", "竞赛名称（子赛）": "英语演讲赛", "竞赛分类": "语言类"},
+        {"序号": "15", "竞赛名称（总）": "外研社全国大学生英语系列赛", "竞赛名称（子赛）": "英语辩论赛", "竞赛分类": "语言类"},
+        {"序号": "16", "竞赛名称（总）": "全国职业院校技能大赛", "竞赛名称（子赛）": "全国职业院校技能大赛", "竞赛分类": "职业技能类"},
+    ]
+
+
+def test_colspan_horizontal_fill():
+    """colspan>1 的单元格横向占据多列（数据区，非标题）。"""
+    html = """<table>
+      <tr><th>A</th><th>B</th><th>C</th></tr>
+      <tr><td colspan="2">合并</td><td>x</td></tr>
+    </table>"""
+    result = table_to_json(html)
+    assert result["rows"] == [{"A": "合并", "B": "合并", "C": "x"}]
