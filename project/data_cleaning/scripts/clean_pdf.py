@@ -12,21 +12,72 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(HERE))
 MINERU_EXE = os.path.join(PROJECT_ROOT, ".venv-mineru", "Scripts", "mineru.exe")
 TABLE_RE = re.compile(r"<table>.*?</table>", re.S)
+IMG_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
+
+
+def _first_sentence(text):
+    """取首句：到第一个 。！？；!?; 截断，再限到 40 字。"""
+    for stop in "。！？；!?;":
+        idx = text.find(stop)
+        if idx > 0:
+            text = text[:idx + 1]
+            break
+    return text[:40].strip()
+
+
+def _figure_caption(md, img_start):
+    """在 md[:img_start] 里给图找 caption：标题优先，段落兜底。"""
+    before = md[:img_start].rstrip()
+    if not before:
+        return ""
+    lines = [ln.strip() for ln in before.split("\n")]
+    for ln in reversed(lines):  # 先找最近的标题
+        if ln.startswith("#"):
+            return ln.lstrip("#").strip()
+    for ln in reversed(lines):  # 再找最近的非空、非图片、非占位行
+        if not ln or ln.startswith("![") or ln.startswith(("[图", "[表")):
+            continue
+        return _first_sentence(ln)
+    return ""
+
+
+def extract_figures_from_markdown(md):
+    """抽 md 里所有图片 → [{n, path, caption, context}]，按出现顺序编号。
+    caption 标题优先、段落兜底；context 是图片前 ~60 字片段，便于溯源。"""
+    figures = []
+    for i, m in enumerate(IMG_RE.finditer(md), 1):
+        ctx_start = max(0, m.start() - 60)
+        context = md[ctx_start:m.start()].strip().replace("\n", " ")[-60:]
+        figures.append({
+            "n": i,
+            "path": m.group(1),
+            "caption": _figure_caption(md, m.start()),
+            "context": context,
+        })
+    return figures
 
 
 def clean_mineru_markdown(md, source_url=""):
     """纯函数：清洗 MineRU 输出的 markdown。
-    抽出所有 <table> → tables（JSON 列表），正文里把表替换成 [表N] 占位。
-    返回 {markdown, tables, source_url}。"""
+    - 抽出所有 <table> → tables（JSON 列表），正文里表替换成 [表N] 占位
+    - 抽出所有图片 → figures（含 caption 溯源），正文里图替换成 [图N] 占位
+    返回 {markdown, tables, figures, source_url}。"""
     tables = extract_tables_from_markdown(md)
-    counter = {"i": 0}
+    figures = extract_figures_from_markdown(md)
 
-    def _replace(_m):
-        counter["i"] += 1
-        return f"\n\n[表{counter['i']}]\n\n"
+    tcounter = {"i": 0}
+    def _trep(_m):
+        tcounter["i"] += 1
+        return f"\n\n[表{tcounter['i']}]\n\n"
 
-    cleaned = TABLE_RE.sub(_replace, md).strip()
-    return {"markdown": cleaned, "tables": tables, "source_url": source_url}
+    fcounter = {"i": 0}
+    def _frep(_m):
+        fcounter["i"] += 1
+        return f"\n\n[图{fcounter['i']}]\n\n"
+
+    cleaned = TABLE_RE.sub(_trep, md)
+    cleaned = IMG_RE.sub(_frep, cleaned).strip()
+    return {"markdown": cleaned, "tables": tables, "figures": figures, "source_url": source_url}
 
 
 def run_mineru(pdf_path, out_dir, backend="pipeline"):
@@ -63,6 +114,12 @@ def clean_pdf(pdf_path, out_dir, source_url=""):
                 json.dump(t, f, ensure_ascii=False, indent=2)
         n_tables = len(result["tables"])
 
+    n_figures = 0
+    if result["figures"]:
+        with open(os.path.join(out_dir, f"{name}_figures.json"), "w", encoding="utf-8") as f:
+            json.dump(result["figures"], f, ensure_ascii=False, indent=2)
+        n_figures = len(result["figures"])
+
     img_src = os.path.join(os.path.dirname(md_path), "images")
     if os.path.isdir(img_src):
         img_dst = os.path.join(out_dir, "images", name)
@@ -70,4 +127,4 @@ def clean_pdf(pdf_path, out_dir, source_url=""):
         for f in os.listdir(img_src):
             shutil.copy(os.path.join(img_src, f), os.path.join(img_dst, f))
 
-    return {"markdown_path": md_out, "tables": n_tables, "source_url": source_url}
+    return {"markdown_path": md_out, "tables": n_tables, "figures": n_figures, "source_url": source_url}

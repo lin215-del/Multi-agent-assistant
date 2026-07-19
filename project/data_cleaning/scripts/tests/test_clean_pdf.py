@@ -47,3 +47,63 @@ def test_no_tables_returns_clean_text():
     assert result["tables"] == []
     assert "<table>" not in result["markdown"]
     assert "纯文字" in result["markdown"]
+
+
+# ---------- 图表溯源 ----------
+def test_figure_caption_from_nearest_title():
+    md = """前面的引子。
+
+## 步骤二：进入申请界面
+
+![](images/abc.jpg)
+
+后续文字。
+"""
+    result = clean_mineru_markdown(md)
+    assert len(result["figures"]) == 1
+    fig = result["figures"][0]
+    assert fig["n"] == 1
+    assert fig["path"] == "images/abc.jpg"
+    assert fig["caption"] == "步骤二：进入申请界面"
+    # 正文里图片被替换成 [图N] 占位
+    assert "[图1]" in result["markdown"]
+    assert "![]" not in result["markdown"]
+    # 非图片文字保留
+    assert "后续文字" in result["markdown"]
+
+
+def test_figure_caption_falls_back_to_paragraph():
+    """图上文没标题时，caption 取最近段落的首句。"""
+    md = """首先在输入框输入"创新学分认定"，然后再点击查询。
+
+![](images/def.jpg)
+"""
+    result = clean_mineru_markdown(md)
+    assert len(result["figures"]) == 1
+    assert "创新学分认定" in result["figures"][0]["caption"]
+
+
+def test_multiple_figures_numbered_sequentially():
+    md = """## 一
+
+![](images/a.jpg)
+
+正文。
+
+## 二
+
+![](images/b.jpg)
+"""
+    result = clean_mineru_markdown(md)
+    assert len(result["figures"]) == 2
+    assert result["figures"][0]["n"] == 1
+    assert result["figures"][1]["n"] == 2
+    assert result["figures"][1]["caption"] == "二"
+    assert "[图1]" in result["markdown"]
+    assert "[图2]" in result["markdown"]
+
+
+def test_no_figures_returns_empty_list():
+    md = "纯文字，没图\n\n另一段"
+    result = clean_mineru_markdown(md)
+    assert result["figures"] == []
