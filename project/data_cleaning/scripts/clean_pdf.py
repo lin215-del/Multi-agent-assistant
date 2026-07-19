@@ -92,7 +92,7 @@ def run_mineru(pdf_path, out_dir, backend="pipeline"):
 def clean_pdf(pdf_path, out_dir, source_url=""):
     """完整清洗一份 PDF：跑 MineRU → 清洗 → 写正文 md + tables/*.json + 复制图片。"""
     name = os.path.splitext(os.path.basename(pdf_path))[0]
-    mineru_out = os.path.join(out_dir, "_mineru", name)
+    mineru_out = os.path.join(out_dir, "_mineru")  # 不带 name：MinerU 自己建 <stem>/auto/，避免双层 stem 撞 Windows 260 路径限制
     os.makedirs(mineru_out, exist_ok=True)
     md_path = run_mineru(pdf_path, mineru_out)
     if not md_path:
