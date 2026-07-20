@@ -5,6 +5,7 @@
 RAGFlow 上传这个 md，切块后检索能命中表格内容 / 图 caption。
 """
 import os
+import json
 import glob
 
 import requests
@@ -168,7 +169,14 @@ def main():
             continue
         md_text = open(raw_md, encoding="utf-8").read()
         result = clean_mineru_markdown(md_text)
-        pkg = package_for_ragflow(name, result["markdown"], result["tables"], result["figures"])
+        # figures 优先用 enrich 后的（VLM caption），没有则用 clean 出的粗 caption
+        figures = result["figures"]
+        rel = os.path.relpath(raw_md, mineru_dir)
+        verify_dir = os.path.join(mineru_dir, rel.split(os.sep)[0])
+        fig_json = os.path.join(verify_dir, stem + "_figures.json")
+        if os.path.exists(fig_json):
+            figures = json.load(open(fig_json, encoding="utf-8"))
+        pkg = package_for_ragflow(name, result["markdown"], result["tables"], figures)
         did = upload_markdown(ds, name, pkg)
         if did:
             doc_ids.append(did)
