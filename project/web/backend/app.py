@@ -17,6 +17,11 @@ import os
 import warnings
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+# 进程启动时把 .env 灌进 os.environ；shell 不 export 也能用
+load_dotenv()
+
 import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
