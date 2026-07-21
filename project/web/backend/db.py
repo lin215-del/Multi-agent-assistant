@@ -28,7 +28,8 @@ class HistoryDB:
 
     def __init__(self, path: str):
         self.path = path
-        self._conn = sqlite3.connect(path)
+        # check_same_thread=False：FastAPI handler 在另一线程跑，SQLite 连接需要跨线程用
+        self._conn = sqlite3.connect(path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self.init()
 

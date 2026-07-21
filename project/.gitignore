@@ -16,3 +16,8 @@ data_cleaning/mineru_output/
 # OS
 .DS_Store
 Thumbs.db
+
+# 项目运行时产物
+web/backend/history.db        # SQLite 问答历史，运行时生成
+.idea/
+.vscode/
