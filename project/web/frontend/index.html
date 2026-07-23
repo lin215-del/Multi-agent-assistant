@@ -1215,6 +1215,16 @@ function buildTrace(data) {
     (data.history_id != null ? "<span><b>History:</b> #" + data.history_id + "</span>" : "");
   box.appendChild(line1);
 
+  if (data.node_trace && data.node_trace.length) {
+    var parts = [];
+    data.node_trace.forEach(function (t) {
+      parts.push(t.node + " " + t.elapsed_ms + "ms");
+    });
+    var nline = el("div", "trace-line");
+    nline.innerHTML = "<b>逐节点：</b>" + parts.join(" → ");
+    box.appendChild(nline);
+  }
+
   if (data.reflection) {
     var ok = data.reflection.ok;
     var line2 = el("div", "trace-line");
