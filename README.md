@@ -3,6 +3,8 @@
 > 基于 LangGraph 多智能体编排 + RAGFlow 检索增强的暨大学生事务问答系统。
 > 给学生问的每一个问题，答案都**带原文出处**——没把握就直说"把握不大"。
 
+**项目代码全部在 [`project/`](project/) 子目录内。** 下面所有路径都相对仓根，往里走先 `cd project`。
+
 ---
 
 ## ✨ 核心特性
@@ -66,6 +68,9 @@
 ## 🚀 快速开始
 
 ```bash
+# 0. 先进项目子目录
+cd project
+
 # 1. 起 RAGFlow 容器（外部依赖；本仓库不含）
 #    按官网 compose 启动，导入 data_cleaning/output/ 下的 md
 
@@ -92,28 +97,33 @@ python web/backend/app.py    # 默认 http://127.0.0.1:5000
 
 ## 📁 目录结构
 
+仓库布局：
+
 ```
 .
-├── agents/                 # 多智能体核心
-│   ├── state.py            # 共享状态 TypedDict
-│   ├── router.py           # 入口分类
-│   ├── retriever.py        # RAGFlow 召回
-│   ├── tools.py            # GPA 加权平均 + JSON 抽取
-│   ├── analyzer.py         # 起草答案
-│   ├── reflection.py       # 自检 + 查询重写
-│   ├── graph.py            # LangGraph 编排（含 MAX_ROUNDS=2）
-│   └── tests/              # 单元 + 图集成测试（mock LLM / RAGFlow）
-├── web/                    # 收银台层
-│   ├── backend/            # Flask + SQLite + auth
-│   └── frontend/           # 单页 SPA（index.html）
-├── data_cleaning/          # 知识库原始加工
-│   ├── raw/                # 爬虫抓下来的 HTML/PDF
-│   ├── scripts/            # 清洗 + VLM + RAGFlow 导入
-│   └── mineru_output/      # MinerU 中间产物（gitignore）
-├── docs/                   # 演示与答辩材料
-│   ├── 演示指南.md          # 8 题演示清单
-│   └── 答辩脚本.md          # 5 分钟讲稿 + 评委追问准备
-└── requirements.txt        # 仅 .venv-mineru 用；agents/web 依赖见上方安装段
+├── README.md                      # 你正在看的这个文件
+├── .gitignore
+└── project/                       # ★ 全部代码与文档
+    ├── agents/                    # 多智能体核心
+    │   ├── state.py               # 共享状态 TypedDict
+    │   ├── router.py              # 入口分类
+    │   ├── retriever.py           # RAGFlow 召回
+    │   ├── tools.py               # GPA 加权平均 + JSON 抽取
+    │   ├── analyzer.py            # 起草答案
+    │   ├── reflection.py          # 自检 + 查询重写
+    │   ├── graph.py               # LangGraph 编排（含 MAX_ROUNDS=2）
+    │   └── tests/                 # 单元 + 图集成测试（mock LLM / RAGFlow）
+    ├── web/                       # 收银台层
+    │   ├── backend/               # Flask + SQLite + auth
+    │   └── frontend/              # 单页 SPA（index.html）
+    ├── data_cleaning/             # 知识库原始加工
+    │   ├── raw/                   # 爬虫抓下来的 HTML/PDF
+    │   ├── scripts/               # 清洗 + VLM + RAGFlow 导入
+    │   └── mineru_output/         # MinerU 中间产物（gitignore）
+    ├── docs/                      # 演示与答辩材料
+    │   ├── 演示指南.md            # 8 题演示清单
+    │   └── 答辩脚本.md            # 5 分钟讲稿 + 评委追问准备
+    └── requirements.txt           # 仅 .venv-mineru 用；agents/web 依赖见上方
 ```
 
 ---
@@ -121,6 +131,8 @@ python web/backend/app.py    # 默认 http://127.0.0.1:5000
 ## 🧪 测试
 
 ```bash
+cd project
+
 .\.venv\Scripts\Activate.ps1
 pytest agents/tests/ -v                # mock LLM 的单元 + 图集成测试
 pytest web/backend/tests/ -v           # API 层测试
@@ -133,13 +145,13 @@ pytest data_cleaning/scripts/tests/ -v # 清洗脚本测试
 
 ## 🎬 演示
 
-详见 [`docs/演示指南.md`](docs/演示指南.md) —— 8 个递进的演示场景，覆盖路由、检索、循环、工具调用、出域拒答。
+详见 [`project/docs/演示指南.md`](project/docs/演示指南.md) —— 8 个递进的演示场景，覆盖路由、检索、循环、工具调用、出域拒答。
 
 ---
 
 ## ⚠️ 已知限制
 
-- Token 存进程内存（`web/backend/auth.py`），重启会失效，需重新登录
+- Token 存进程内存（`project/web/backend/auth.py`），重启会失效，需重新登录
 - 反思重试上限 2 次（再拒答或带"把握不大"前缀）
 - 课程列表很长时 GPT 偶发漏抽结构化字段（32B 模型限制）
 - `.venv/` 与 `.venv-mineru/` 不入库，请按"快速开始"重建
