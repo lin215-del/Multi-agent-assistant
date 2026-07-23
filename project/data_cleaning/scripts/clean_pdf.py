@@ -4,7 +4,8 @@ PDF 清洗（把 MineRU 串进清洗层）。
 - run_mineru: subprocess 跑 mineru CLI 解析 PDF
 - clean_pdf: 编排——跑 MineRU → 清洗 → 写正文 + tables/*.json + 复制图片
 """
-import os, re, json, shutil, subprocess
+import os, re, json, shutil, subprocess, sys
+from pathlib import Path
 
 from clean_tables import extract_tables_from_markdown
 
@@ -81,9 +82,14 @@ def clean_mineru_markdown(md, source_url=""):
 
 
 def run_mineru(pdf_path, out_dir, backend="pipeline"):
-    """subprocess 跑 mineru CLI 解析 PDF。成功返回 markdown 路径，失败 None。"""
+    """subprocess 跑 mineru CLI 解析 PDF。成功返回 markdown 路径，失败返回 None。"""
     cmd = [MINERU_EXE, "-p", pdf_path, "-o", out_dir, "-b", backend, "-m", "auto", "-l", "ch"]
-    subprocess.run(cmd, check=True, capture_output=True)
+    try:
+        subprocess.run(cmd, check=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        stderr_text = e.stderr.decode(errors="replace") if e.stderr else "(无 stderr)"
+        print(f"[MinerU 失败] {e}\n{stderr_text}", file=sys.stderr, flush=True)
+        return None
     stem = os.path.splitext(os.path.basename(pdf_path))[0]
     md_path = os.path.join(out_dir, stem, "auto", f"{stem}.md")
     return md_path if os.path.exists(md_path) else None
@@ -97,13 +103,13 @@ def clean_pdf(pdf_path, out_dir, source_url=""):
     md_path = run_mineru(pdf_path, mineru_out)
     if not md_path:
         return None
-    md = open(md_path, encoding="utf-8").read()
+    md = Path(md_path).read_text(encoding="utf-8")
     result = clean_mineru_markdown(md, source_url)
 
     os.makedirs(out_dir, exist_ok=True)
     header = f"# {name}\n\n" + (f"> 来源：{source_url}\n\n" if source_url else "")
     md_out = os.path.join(out_dir, f"{name}.md")
-    open(md_out, "w", encoding="utf-8").write(header + result["markdown"])
+    Path(md_out).write_text(header + result["markdown"], encoding="utf-8")
 
     n_tables = 0
     if result["tables"]:

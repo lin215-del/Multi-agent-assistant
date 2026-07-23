@@ -41,8 +41,13 @@ def finalize_node(state: AgentState) -> dict:
 
 
 def retry_node(state: AgentState) -> dict:
-    """重试前轮数 +1（用来限制反思循环次数）。"""
-    return {"round": (state.get("round") or 0) + 1}
+    """重试前：用反思给的 rewritten_query 改写检索词 + 清空旧检索结果 + 轮数 +1。
+    清空 retrieved 是为了让 retriever 用新 query 重新检索，不残留上一轮的旧 chunks。"""
+    refl = state.get("reflection") or {}
+    rq = refl.get("rewritten_query") or state.get("query") or state["question"]
+    return {"round": (state.get("round") or 0) + 1,
+            "query": rq,
+            "retrieved": []}
 
 
 def _after_router(state):
@@ -98,7 +103,7 @@ def build_graph(router=None, retriever=None, analyzer=None, tool=None,
         "reflection": "reflection", "finalize_node": "finalize_node"})
     g.add_conditional_edges("reflection", _after_reflection, {
         "finalize_node": "finalize_node", "retry_node": "retry_node"})
-    g.add_edge("retry_node", "analyzer")
+    g.add_edge("retry_node", "retriever")
     g.add_edge("finalize_node", END)
     g.add_edge("reject_node", END)
     return g.compile()

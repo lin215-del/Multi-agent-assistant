@@ -43,7 +43,10 @@ def _make_app(route, reflection_seq, call_log):
             ok = reflection_seq[-1]
         else:
             ok = True
-        return {"reflection": {"ok": ok, "reason": "r"}}
+        result = {"ok": ok, "reason": "r"}
+        if not ok:
+            result["rewritten_query"] = state["question"] + " 改写"
+        return {"reflection": result}
 
     return build_graph(router=router, tool=tool, retriever=retriever,
                        analyzer=analyzer, reflection=reflection)
@@ -91,12 +94,31 @@ def test_both_path_runs_tool_then_retriever():
 
 # ---------- 反思循环 ----------
 def test_reflection_retry_then_pass():
-    """第一次不通过、第二次通过 → 分析跑 2 次、最终收 analysis。"""
+    """第一次不通过、第二次通过 → 每次重试重新检索 + 重新分析。"""
     log = []
     app = _make_app("retrieve", [False, True], log)
     result = app.invoke({"question": "q"})
+    assert log.count("retriever") == 2  # 初次 + 重试各一次检索
     assert log.count("analyzer") == 2
+    assert log.count("reflection") == 2
     assert result["final"] == "ANS"
+
+
+def test_retry_rewrites_query(monkeypatch):
+    """retry_node 从 reflection 取 rewritten_query 写进 query，并清空 retrieved
+    触发重新检索。"""
+    from agents.graph import retry_node
+    state = {
+        "question": "原始问题",
+        "query": "原始检索词",
+        "retrieved": [{"content": "旧资料"}],
+        "reflection": {"ok": False, "reason": "不够好", "rewritten_query": "改写后的检索词"},
+        "round": 0,
+    }
+    out = retry_node(state)
+    assert out["query"] == "改写后的检索词"
+    assert out["retrieved"] == []  # 清空旧资料，触发重新检索
+    assert out["round"] == 1
 
 
 def test_max_rounds_gives_up():
@@ -105,4 +127,5 @@ def test_max_rounds_gives_up():
     app = _make_app("retrieve", [False, False, False], log)
     result = app.invoke({"question": "q"})
     assert log.count("analyzer") == MAX_ROUNDS + 1
+    assert log.count("retriever") == MAX_ROUNDS + 1  # 每次分析前都重新检索
     assert "把握不大" in result["final"]

@@ -27,7 +27,9 @@ def build_prompt(question: str, chunks: list[dict], tool_output=None) -> str:
     if chunks:
         for i, c in enumerate(chunks, 1):
             lines.append("【资料" + str(i) + "】来源：" + str(c.get("source", "")))
+            lines.append("<source_chunk>")
             lines.append(str(c.get("content", "")))
+            lines.append("</source_chunk>")
             lines.append("")
     else:
         lines.append("（没有检索到相关资料）")

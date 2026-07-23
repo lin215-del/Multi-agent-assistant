@@ -41,6 +41,16 @@ def test_parse_empty_or_garbage_defaults_retrieve():
     assert parse_route("不知道") == "retrieve"
 
 
+def test_parse_does_not_match_substring():
+    """'reject' 里不含 'tool' 子串——但 LLM 输出 'reject because tool' 时
+    'tool' 也在字符串里。要按 LLM 真正意图（优先级或最早出现）判，不能子串误判。
+    具体：'reject' 出现在文本更早位置时，应判 reject 而非 tool。"""
+    assert parse_route("reject because tool not available") == "reject"
+    assert parse_route("类别：reject，原因：不是学生事务") == "reject"
+    assert parse_route("this is a tool question") == "tool"
+    assert parse_route("need both retrieve and tool") == "both"
+
+
 # ---------- router_node：把 LLM 分类结果写进 State ----------
 def test_router_node_writes_route_and_query(monkeypatch):
     """读 question → 调 LLM → 把 route + query 写回工作台。"""

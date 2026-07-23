@@ -14,7 +14,7 @@ from agents.state import AgentState
 
 
 def parse_check(raw):
-    """把 LLM 质检输出解析成 {ok, reason}；解析不出来默认 ok=True（不卡流程）。"""
+    """把 LLM 质检输出解析成 {ok, reason, rewritten_query?}；解析不出来默认 ok=True。"""
     if not raw:
         return {"ok": True, "reason": "反思无输出，默认通过"}
     m = re.search(r"\{.*\}", raw, re.S)
@@ -29,7 +29,11 @@ def parse_check(raw):
         ok = ok.strip().lower() in ("true", "yes", "通过", "ok", "1")
     elif ok is None:
         ok = True
-    return {"ok": bool(ok), "reason": str(d.get("reason", ""))}
+    result = {"ok": bool(ok), "reason": str(d.get("reason", ""))}
+    rq = d.get("rewritten_query")
+    if rq:
+        result["rewritten_query"] = str(rq)
+    return result
 
 
 def build_check_prompt(question, retrieved, analysis):
@@ -43,6 +47,7 @@ def build_check_prompt(question, retrieved, analysis):
 3. 资料不足时坦白说了"没找到可靠资料"，而不是瞎编
 
 只输出 JSON：{{"ok": true 或 false, "reason": "一句话原因"}}
+如果不通过（ok=false），还要加上 rewritten_query 字段——把学生问题改写成更好的检索词（更具体/更多同义词），让下次检索能命中最相关的资料。
 
 学生问题：{question}
 可引用的来源：{sources}

@@ -107,3 +107,22 @@ def test_no_figures_returns_empty_list():
     md = "纯文字，没图\n\n另一段"
     result = clean_mineru_markdown(md)
     assert result["figures"] == []
+
+
+# ---------- run_mineru：MinerU 失败时 stderr 不能丢 ----------
+def test_run_mineru_prints_stderr_on_failure(monkeypatch, capsys):
+    """MinerU 挂了不能只看到 CalledProcessError——stderr 也要打出来方便排查。"""
+    import subprocess
+
+    def fake_run(cmd, **kwargs):
+        raise subprocess.CalledProcessError(
+            1, cmd, output=b"", stderr=b"mineru: PDF header corrupted\n"
+        )
+
+    monkeypatch.setattr("subprocess.run", fake_run)
+    from clean_pdf import run_mineru
+
+    result = run_mineru("bad.pdf", "/tmp/out")
+    assert result is None
+    captured = capsys.readouterr()
+    assert "mineru" in captured.err

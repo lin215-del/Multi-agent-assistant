@@ -15,9 +15,14 @@ import argparse
 from pathlib import Path
 
 import requests
+from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # project/
 ENV_PATH = PROJECT_ROOT / ".env"
+# 模块加载时把 .env 灌进 os.environ
+if ENV_PATH.exists():
+    load_dotenv(dotenv_path=str(ENV_PATH))
+
 MINERU_OUTPUT = PROJECT_ROOT / "data_cleaning" / "mineru_output"
 CACHE_PATH = MINERU_OUTPUT / "vlm_cache.json"
 DEFAULT_MODEL = "Qwen/Qwen3-VL-8B-Instruct"
@@ -25,17 +30,10 @@ DEFAULT_API_BASE = "https://api.siliconflow.cn/v1"
 
 
 def load_env():
-    """读 project/.env 的 SiliconFlow 配置（UTF-8，避开 Windows GBK 坑）。"""
-    vals = {}
-    if ENV_PATH.exists():
-        for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, v = line.split("=", 1)
-                vals[k.strip()] = v.strip()
-    key = vals.get("SILICONFLOW_API_KEY") or os.environ.get("SILICONFLOW_API_KEY", "")
-    base = vals.get("SILICONFLOW_API_BASE") or os.environ.get("SILICONFLOW_API_BASE", DEFAULT_API_BASE)
-    model = vals.get("VISUAL_MODEL") or os.environ.get("VISUAL_MODEL", DEFAULT_MODEL)
+    """读 SiliconFlow 配置。.env 已在模块加载时通过 load_dotenv() 注入 os.environ。"""
+    key = os.environ.get("SILICONFLOW_API_KEY", "")
+    base = os.environ.get("SILICONFLOW_API_BASE", DEFAULT_API_BASE)
+    model = os.environ.get("VISUAL_MODEL", DEFAULT_MODEL)
     return key, base, model
 
 

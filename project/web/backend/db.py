@@ -22,6 +22,7 @@ class HistoryDB:
       analysis TEXT,
       round INTEGER DEFAULT 0,
       latency_ms INTEGER DEFAULT 0,
+      username TEXT,
       created_at TEXT DEFAULT (datetime('now','localtime'))
     )
     """
@@ -42,8 +43,8 @@ class HistoryDB:
         """插入一条历史，返回新行 id。"""
         cur = self._conn.execute(
             """INSERT INTO history
-               (question, route, answer, matches_json, reflection_json, analysis, round, latency_ms)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+               (question, route, answer, matches_json, reflection_json, analysis, round, latency_ms, username)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 record["question"],
                 record.get("route"),
@@ -53,16 +54,23 @@ class HistoryDB:
                 record.get("analysis"),
                 int(record.get("round") or 0),
                 int(record.get("latency_ms") or 0),
+                record.get("username"),
             ),
         )
         self._conn.commit()
         return cur.lastrowid
 
-    def list_recent(self, limit: int = 50) -> list[dict]:
-        """时间倒序列表，限制条数。"""
-        cur = self._conn.execute(
-            "SELECT * FROM history ORDER BY id DESC LIMIT ?", (limit,)
-        )
+    def list_recent(self, limit: int = 50, username: str = None) -> list[dict]:
+        """时间倒序列表。username 非空时只看该用户的记录。"""
+        if username:
+            cur = self._conn.execute(
+                "SELECT * FROM history WHERE username = ? ORDER BY id DESC LIMIT ?",
+                (username, limit),
+            )
+        else:
+            cur = self._conn.execute(
+                "SELECT * FROM history ORDER BY id DESC LIMIT ?", (limit,)
+            )
         return [_row_to_dict(r) for r in cur.fetchall()]
 
     def get(self, rid: int) -> Optional[dict]:

@@ -9,6 +9,12 @@ import json
 import glob
 
 import requests
+from dotenv import load_dotenv
+
+# 模块加载时把 .env 灌进 os.environ（幂等，重复调用不覆盖已有值）
+_ENV_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), ".env")
+if os.path.exists(_ENV_PATH):
+    load_dotenv(dotenv_path=_ENV_PATH)
 
 DATASET_NAME = "暨大学生助手-多模态清洗"
 DEFAULT_BASE = "http://localhost"
@@ -58,18 +64,10 @@ def package_for_ragflow(name, markdown, tables, figures, source_url=""):
 
 # ---------- RAGFlow API（IO 函数，端点已手动验证）----------
 def load_env():
-    """从 project/.env 读 RAGFLOW_API_KEY + RAGFLOW_BASE_URL，返回 (key, base)。
-    .env 优先于环境变量；UTF-8 读，避开 Windows GBK 默认编码坑。"""
-    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), ".env")
-    vals = {}
-    if os.path.exists(env_path):
-        for line in open(env_path, encoding="utf-8"):
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, v = line.split("=", 1)
-                vals[k.strip()] = v.strip()
-    key = vals.get("RAGFLOW_API_KEY") or os.environ.get("RAGFLOW_API_KEY", "")
-    base = vals.get("RAGFLOW_BASE_URL") or os.environ.get("RAGFLOW_BASE_URL", DEFAULT_BASE)
+    """读 RAGFLOW_API_KEY + RAGFLOW_BASE_URL，返回 (key, base)。
+    .env 已在模块加载时通过 load_dotenv() 注入 os.environ。"""
+    key = os.environ.get("RAGFLOW_API_KEY", "")
+    base = os.environ.get("RAGFLOW_BASE_URL", DEFAULT_BASE)
     return key, base
 
 

@@ -1,16 +1,19 @@
-"""FastAPI 后端入口：六端点 + 静态托管前端。
+"""FastAPI 后端入口：六端点 + 认证 + 静态托管前端。
 
 启动流程：
   create_app() 建应用 + 在闭包里实例化 DB；模块顶层尝试编译 LangGraph（图无 env 时 warning）。
 
 端点：
-  POST /api/chat        问答（调 ask + classify chunks + 落库 + 返回 trace）
-  GET  /api/cards       服务卡片清单
-  GET  /api/cards/{id}  单卡片详情
-  GET  /api/history     历史倒序列表
-  GET  /api/history/{id} 单条 trace
-  GET  /api/documents   代理 RAGFlow 文档列表
-  GET  /                静态托管 web/frontend/
+  POST /api/register  注册普通用户
+  POST /api/login     登录（管理员 / 普通用户）
+  GET  /api/me        当前用户信息
+  POST /api/chat      问答（需登录，调 ask + classify chunks + 落库 + 返回 trace）
+  GET  /api/cards     服务卡片清单（需登录）
+  GET  /api/cards/{id} 单卡片详情（需登录）
+  GET  /api/history   历史倒序列表（管理员看全部，用户看自己）
+  GET  /api/history/{id} 单条 trace（需登录）
+  GET  /api/documents 代理 RAGFlow 文档列表（仅管理员）
+  GET  /              静态托管 web/frontend/
 """
 import json
 import os
@@ -19,13 +22,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# 进程启动时把 .env 灌进 os.environ；shell 不 export 也能用
 load_dotenv()
 
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 
+from web.backend.auth import register_user, login_user, get_token_info
 from web.backend.chunk_classifier import classify_chunk
 from web.backend.db import HistoryDB
 from web.backend.graph_service import compile_app
@@ -39,7 +42,6 @@ FRONTEND_DIR = str(Path(__file__).resolve().parent.parent / "frontend")
 
 
 def _load_cards(path: str) -> dict:
-    """启动时读 cards.json；缺失用空 groups 兜底（不阻塞启动）。"""
     try:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
@@ -49,7 +51,6 @@ def _load_cards(path: str) -> dict:
 
 
 def _list_ragflow_documents() -> list[dict]:
-    """代理 RAGFlow GET /api/v1/datasets/{id}/documents，返回 [{name,chunk_count,run}, ...]。"""
     base = os.environ["RAGFLOW_BASE_URL"]
     key = os.environ["RAGFLOW_API_KEY"]
     ds = os.environ["RAGFLOW_DATASET_ID"]
@@ -68,7 +69,6 @@ def _list_ragflow_documents() -> list[dict]:
 
 
 def _enrich_matches(matches: list[dict]) -> list[dict]:
-    """给每个 chunk 加 type（table/figure/text），答辫多模态差异化的钩子。"""
     out = []
     for m in matches or []:
         m2 = dict(m)
@@ -78,7 +78,6 @@ def _enrich_matches(matches: list[dict]) -> list[dict]:
 
 
 def _flat_card_index(cards: dict) -> dict:
-    """把 cards.json 拍平为 {id: card} 字典，方便按 id 查。"""
     idx = {}
     for g in cards.get("groups", []):
         for c in g.get("cards", []):
@@ -86,19 +85,63 @@ def _flat_card_index(cards: dict) -> dict:
     return idx
 
 
-def create_app() -> FastAPI:
-    """工厂函数：测试和真实启动都用它；DB 路径由模块级 DB_PATH 控制（测试 monkeypatch 替换）。
+def _get_current_user(authorization: str = Header(None)) -> dict:
+    """FastAPI 依赖：从 Authorization header 解析当前用户。未登录/过期抛 401。"""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="未登录")
+    token = authorization[len("Bearer "):]
+    info = get_token_info(token)
+    if info is None:
+        raise HTTPException(status_code=401, detail="登录已过期，请重新登录")
+    return info
 
-    DB 实例放闭包，不依赖 application.state（避免 lifespan 时序问题）。
-    """
+
+def _require_admin(user: dict = Depends(_get_current_user)) -> dict:
+    """仅管理员可访问。"""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="仅管理员可访问")
+    return user
+
+
+def create_app() -> FastAPI:
     db = HistoryDB(DB_PATH)
     cards = _load_cards(CARDS_PATH)
     card_index = _flat_card_index(cards)
 
     application = FastAPI(title="暨大学生助手 API")
 
+    # ---- 认证端点 ----
+
+    @application.post("/api/register")
+    def register(payload: dict):
+        username = (payload.get("username") or "").strip()
+        password = (payload.get("password") or "").strip()
+        if not username or not password:
+            raise HTTPException(status_code=400, detail="用户名和密码不能为空")
+        try:
+            return register_user(username, password, DB_PATH)
+        except ValueError as e:
+            raise HTTPException(status_code=409, detail=str(e))
+
+    @application.post("/api/login")
+    def login(payload: dict):
+        username = (payload.get("username") or "").strip()
+        password = (payload.get("password") or "").strip()
+        if not username or not password:
+            raise HTTPException(status_code=400, detail="用户名和密码不能为空")
+        try:
+            return login_user(username, password, DB_PATH)
+        except ValueError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+
+    @application.get("/api/me")
+    def me(user: dict = Depends(_get_current_user)):
+        return {"username": user["username"], "role": user["role"]}
+
+    # ---- 业务端点 ----
+
     @application.post("/api/chat")
-    def chat(payload: dict):
+    def chat(payload: dict, user: dict = Depends(_get_current_user)):
         from web.backend.graph_service import ask
         question = (payload.get("question") or "").strip()
         if not question:
@@ -116,6 +159,7 @@ def create_app() -> FastAPI:
             "analysis": trace.get("analysis"),
             "round": trace.get("round"),
             "latency_ms": trace.get("latency_ms"),
+            "username": user["username"],
         }
         try:
             trace["history_id"] = db.save(record)
@@ -125,28 +169,30 @@ def create_app() -> FastAPI:
         return trace
 
     @application.get("/api/cards")
-    def list_cards():
+    def list_cards(user: dict = Depends(_get_current_user)):
         return cards
 
     @application.get("/api/cards/{card_id}")
-    def get_card(card_id: str):
+    def get_card(card_id: str, user: dict = Depends(_get_current_user)):
         if card_id not in card_index:
             raise HTTPException(status_code=404, detail=f"卡片不存在: {card_id}")
         return card_index[card_id]
 
     @application.get("/api/history")
-    def list_history(limit: int = 50):
-        return db.list_recent(limit=limit)
+    def list_history(limit: int = 50, user: dict = Depends(_get_current_user)):
+        # 管理员看全部，普通用户只看自己
+        uname = None if user["role"] == "admin" else user["username"]
+        return db.list_recent(limit=limit, username=uname)
 
     @application.get("/api/history/{rid}")
-    def get_history(rid: int):
+    def get_history(rid: int, user: dict = Depends(_get_current_user)):
         row = db.get(rid)
         if row is None:
             raise HTTPException(status_code=404, detail=f"历史不存在: {rid}")
         return row
 
     @application.get("/api/documents")
-    def list_documents():
+    def list_documents(user: dict = Depends(_require_admin)):
         try:
             docs = _list_ragflow_documents()
             return {"docs": docs, "count": len(docs)}
@@ -163,7 +209,6 @@ APP = create_app()
 
 
 def _safe_compile_at_import():
-    """模块 import 时尝试编译 LangGraph 图；env 缺失时 warning 不报错。"""
     try:
         compile_app()
     except KeyError as exc:

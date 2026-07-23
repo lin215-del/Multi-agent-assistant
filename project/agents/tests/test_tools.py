@@ -67,6 +67,19 @@ def test_parse_garbage_returns_empty():
     assert _parse_courses_json(None) == []
 
 
+def test_parse_handles_trailing_brackets():
+    """贪梦正则会从第一个 [ 吃到最后一个 ]——后面有 [1,2] 多余内容时，
+    json.loads 整个串会失败，返回 []。应只取第一个完整 JSON 数组。"""
+    raw = '[{"score":85,"credits":4}] 参考范围 [3, 5]'
+    assert _parse_courses_json(raw) == [{"score": 85.0, "credits": 4.0}]
+
+
+def test_parse_handles_multiple_json_arrays():
+    """LLM 可能输出多组 JSON，只取第一组。"""
+    raw = '第一个 [{"score":78,"credits":3}] 第二个 [{"score":90,"credits":2}]'
+    assert _parse_courses_json(raw) == [{"score": 78.0, "credits": 3.0}]
+
+
 def test_parse_skips_items_missing_fields():
     raw = '[{"score":85},{"credits":3},{"score":90,"credits":3}]'
     # 前两项缺字段被跳过，只留第三项

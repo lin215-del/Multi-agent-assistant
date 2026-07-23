@@ -38,14 +38,19 @@ _FEWSHOT = """你是学生助手的调度员。把学生问题分到下面 4 类
 
 
 def parse_route(text: str) -> Route:
-    """把 LLM 原始输出解析成合法 Route；解析不出来兜底 retrieve。"""
+    """把 LLM 原始输出解析成合法 Route；解析不出来兜底 retrieve。
+
+    按每个合法类别词在 LLM 输出中的最早出现位置选——谁先出现谁就是 LLM 的真实意图。
+    避免固定遍历顺序导致的子串误判（如 "reject because tool..." 先匹配到 "tool"）。"""
     if not text:
         return "retrieve"
     t = text.strip().lower()
+    best, best_pos = "retrieve", len(t)
     for r in VALID_ROUTES:
-        if r in t:
-            return r  # type: ignore[return-value]
-    return "retrieve"
+        pos = t.find(r)
+        if pos != -1 and pos < best_pos:
+            best, best_pos = r, pos  # type: ignore[assignment]
+    return best  # type: ignore[return-value]
 
 
 def _build_prompt(question: str) -> str:

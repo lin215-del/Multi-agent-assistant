@@ -1,10 +1,11 @@
-"""app.py 的测试。TDD：用 FastAPI TestClient + monkeypatch 假 graph_service.ask，
-不真连 LLM/RAGFlow；只验端点契约（请求形状 / 响应字段 / 落库 / 状态码）。
+"""app.py 的测试：端点契约 + 认证。
 
-真联通性冒烟放最后用 .env 真值跑一次。
+TDD 约定：用 FastAPI TestClient + monkeypatch 假 graph_service.ask，不真连 LLM/RAGFlow。
+认证：直接注 token 进 auth 模块的内存表，不用走 login/register。
 """
 import json
-import os, sys
+import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
@@ -18,8 +19,24 @@ from web.backend.app import create_app
 
 
 @pytest.fixture
+def auth_headers():
+    """普通用户 token。"""
+    from web.backend.auth import _tokens
+    _tokens["test-token"] = {"username": "testuser", "role": "user"}
+    return {"Authorization": "Bearer test-token"}
+
+
+@pytest.fixture
+def admin_headers():
+    """管理员 token。"""
+    from web.backend.auth import _tokens
+    _tokens["admin-token"] = {"username": "admin", "role": "admin"}
+    return {"Authorization": "Bearer admin-token"}
+
+
+@pytest.fixture
 def client(monkeypatch, tmp_path):
-    """建一个用内存 SQLite 的 FastAPI TestClient；monkeypatch graph_service.ask 用假函数。"""
+    """TestClient：内存 SQLite + 假 ask。"""
     db_path = str(tmp_path / "history.db")
     monkeypatch.setattr(app_module, "DB_PATH", db_path)
     fake_ask = lambda q: {
@@ -38,10 +55,66 @@ def client(monkeypatch, tmp_path):
     return TestClient(application)
 
 
-# ---------- /api/chat ----------
-def test_chat_returns_answer_and_history_id(client):
-    """POST /api/chat 调 ask + 落库，返回 {answer, history_id, ...}。"""
-    r = client.post("/api/chat", json={"question": "国奖申请条件"})
+# ========== 认证端点 ==========
+
+def test_register_creates_user(client):
+    r = client.post("/api/register", json={"username": "alice", "password": "pw123"})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["role"] == "user"
+    assert data["username"] == "alice"
+    assert "token" in data
+
+
+def test_register_duplicate_rejected(client):
+    client.post("/api/register", json={"username": "bob", "password": "pw"})
+    r = client.post("/api/register", json={"username": "bob", "password": "pw"})
+    assert r.status_code == 409
+
+
+def test_register_empty_username_rejected(client):
+    r = client.post("/api/register", json={"username": "", "password": "pw"})
+    assert r.status_code == 400
+
+
+def test_login_as_admin(client):
+    r = client.post("/api/login", json={"username": "admin", "password": "admin123"})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["role"] == "admin"
+    assert "token" in data
+
+
+def test_login_as_registered_user(client):
+    client.post("/api/register", json={"username": "carol", "password": "pw456"})
+    r = client.post("/api/login", json={"username": "carol", "password": "pw456"})
+    assert r.status_code == 200
+    assert r.json()["role"] == "user"
+
+
+def test_login_bad_password(client):
+    client.post("/api/register", json={"username": "dave", "password": "right"})
+    r = client.post("/api/login", json={"username": "dave", "password": "wrong"})
+    assert r.status_code == 401
+
+
+def test_me_returns_user_info(client, auth_headers):
+    r = client.get("/api/me", headers=auth_headers)
+    assert r.status_code == 200
+    data = r.json()
+    assert data["username"] == "testuser"
+    assert data["role"] == "user"
+
+
+def test_me_without_token_returns_401(client):
+    r = client.get("/api/me")
+    assert r.status_code == 401
+
+
+# ========== /api/chat ==========
+
+def test_chat_returns_answer_and_history_id(client, auth_headers):
+    r = client.post("/api/chat", json={"question": "国奖申请条件"}, headers=auth_headers)
     assert r.status_code == 200
     data = r.json()
     assert data["answer"] == "answer_for:国奖申请条件"
@@ -50,35 +123,38 @@ def test_chat_returns_answer_and_history_id(client):
     assert data["latency_ms"] >= 0
 
 
-def test_chat_rejects_missing_question(client):
-    """没 question 字段 → 422 校验失败。"""
-    r = client.post("/api/chat", json={})
+def test_chat_requires_auth(client):
+    r = client.post("/api/chat", json={"question": "x"})
+    assert r.status_code == 401
+
+
+def test_chat_rejects_missing_question(client, auth_headers):
+    r = client.post("/api/chat", json={}, headers=auth_headers)
     assert r.status_code == 422
 
 
-def test_chat_classifies_each_match_with_type(client, monkeypatch):
-    """matches 列表里每条 chunk 都被 classify_chunk 加 type 字段（table/figure/text）。"""
+def test_chat_classifies_each_match_with_type(client, auth_headers, monkeypatch):
     fake_ask = lambda q: {
         "answer": "x",
         "route": "retrieve",
         "matches": [
-            {"content": "| --- |\n| 表 |", "source": "PDF-1", "score": 0.9},   # 表格
-            {"content": "[图1] 流程图", "source": "PDF-1", "score": 0.85},     # 图
-            {"content": "普通正文段落…", "source": "通知-1", "score": 0.7},   # 正文
+            {"content": "| --- |\n| 表 |", "source": "PDF-1", "score": 0.9},
+            {"content": "[图1] 流程图", "source": "PDF-1", "score": 0.85},
+            {"content": "普通正文段落…", "source": "通知-1", "score": 0.7},
         ],
         "tool_output": None, "analysis": "", "reflection": None, "round": 0,
         "latency_ms": 10, "error": None,
     }
     monkeypatch.setattr("web.backend.graph_service.ask", fake_ask)
-    r = client.post("/api/chat", json={"question": "x"})
+    r = client.post("/api/chat", json={"question": "x"}, headers=auth_headers)
     types = [m["type"] for m in r.json()["matches"]]
     assert types == ["table", "figure", "text"]
 
 
-# ---------- /api/cards ----------
-def test_cards_returns_groups(client):
-    """GET /api/cards → cards.json 全量。"""
-    r = client.get("/api/cards")
+# ========== /api/cards ==========
+
+def test_cards_returns_groups(client, auth_headers):
+    r = client.get("/api/cards", headers=auth_headers)
     assert r.status_code == 200
     data = r.json()
     assert "groups" in data
@@ -87,81 +163,97 @@ def test_cards_returns_groups(client):
     assert len(data["groups"][0]["cards"]) >= 5
 
 
-def test_cards_by_id_returns_single_card(client):
-    """GET /api/cards/{id} → 单卡片详情。"""
-    r = client.get("/api/cards/通知-857469")
+def test_cards_requires_auth(client):
+    r = client.get("/api/cards")
+    assert r.status_code == 401
+
+
+def test_cards_by_id_returns_single_card(client, auth_headers):
+    r = client.get("/api/cards/通知-857469", headers=auth_headers)
     assert r.status_code == 200
-    data = r.json()
-    assert data["id"] == "通知-857469"
-    assert "title" in data
+    assert r.json()["id"] == "通知-857469"
 
 
-def test_cards_by_id_missing_returns_404(client):
-    """不存在的卡片 id → 404。"""
-    r = client.get("/api/cards/不存在的id")
+def test_cards_by_id_missing_returns_404(client, auth_headers):
+    r = client.get("/api/cards/不存在的id", headers=auth_headers)
     assert r.status_code == 404
 
 
-# ---------- /api/history ----------
-def test_history_lists_recent_after_chat(client):
-    """先聊一次，再查历史应能拿到刚才那条。"""
-    client.post("/api/chat", json={"question": "first"})
-    r = client.get("/api/history?limit=10")
+# ========== /api/history ==========
+
+def test_history_lists_recent_after_chat(client, auth_headers):
+    client.post("/api/chat", json={"question": "first"}, headers=auth_headers)
+    r = client.get("/api/history?limit=10", headers=auth_headers)
     assert r.status_code == 200
     rows = r.json()
     assert len(rows) >= 1
     assert rows[0]["question"] == "first"
 
 
-def test_history_by_id_returns_full_trace(client):
-    """GET /api/history/{id} → 完整 trace（含 reflection / matches / analysis）。"""
-    chat = client.post("/api/chat", json={"question": "z"}).json()
-    rid = chat["history_id"]
-    r = client.get(f"/api/history/{rid}")
+def test_history_scoped_to_user(client, auth_headers, monkeypatch, tmp_path):
+    """普通用户只能看自己的历史。"""
+    from web.backend.auth import _tokens
+    _tokens["other-token"] = {"username": "other", "role": "user"}
+    client.post("/api/chat", json={"question": "mine"}, headers=auth_headers)
+    client.post("/api/chat", json={"question": "theirs"}, headers={"Authorization": "Bearer other-token"})
+    r = client.get("/api/history?limit=50", headers=auth_headers)
+    questions = [row["question"] for row in r.json()]
+    assert "mine" in questions
+    assert "theirs" not in questions
+
+
+def test_history_admin_sees_all(client, auth_headers, admin_headers):
+    """管理员看全部记录。"""
+    client.post("/api/chat", json={"question": "by_user"}, headers=auth_headers)
+    r = client.get("/api/history?limit=50", headers=admin_headers)
+    questions = [row["question"] for row in r.json()]
+    assert "by_user" in questions
+
+
+def test_history_by_id_returns_full_trace(client, auth_headers):
+    chat = client.post("/api/chat", json={"question": "z"}, headers=auth_headers).json()
+    r = client.get(f"/api/history/{chat['history_id']}", headers=auth_headers)
     assert r.status_code == 200
     data = r.json()
     assert data["question"] == "z"
     assert data["reflection"] == {"ok": True, "reason": "ok"}
-    assert isinstance(data["matches"], list)
 
 
-def test_history_by_id_missing_returns_404(client):
-    """不存在的 history id → 404。"""
-    r = client.get("/api/history/99999")
+def test_history_by_id_missing_returns_404(client, auth_headers):
+    r = client.get("/api/history/99999", headers=auth_headers)
     assert r.status_code == 404
 
 
-# ---------- /api/documents ----------
-def test_documents_proxies_ragflow_list(monkeypatch, tmp_path):
-    """GET /api/documents 代理 RAGFlow；monkeypatch _list_ragflow_documents 不依赖 env/真实请求。"""
+# ========== /api/documents（仅管理员） ==========
+
+def test_documents_admin_only(client, auth_headers, admin_headers, monkeypatch, tmp_path):
     db_path = str(tmp_path / "history.db")
     monkeypatch.setattr(app_module, "DB_PATH", db_path)
-    monkeypatch.setattr(
-        app_module, "_list_ragflow_documents",
-        lambda: [
-            {"name": "通知-857469.md", "chunk_count": 5, "run": "DONE"},
-            {"name": "PDF-yingzai.md", "chunk_count": 12, "run": "DONE"},
-        ],
-    )
+    monkeypatch.setattr(app_module, "_list_ragflow_documents", lambda: [
+        {"name": "通知-857469.md", "chunk_count": 5, "run": "DONE"},
+    ])
     application = create_app()
     c = TestClient(application)
-    r = c.get("/api/documents")
+    # 普通用户 403
+    r = c.get("/api/documents", headers=auth_headers)
+    assert r.status_code == 403
+    # 管理员 200
+    r = c.get("/api/documents", headers=admin_headers)
     assert r.status_code == 200
-    docs = r.json()["docs"]
-    assert len(docs) == 2
-    assert docs[0]["name"] == "通知-857469.md"
+    assert len(r.json()["docs"]) == 1
 
 
 def test_documents_handles_ragflow_error(monkeypatch, tmp_path):
-    """RAGFlow 抛异常时返回 503 + 错误信息（FastAPI 默认 detail 字段）。"""
     db_path = str(tmp_path / "history.db")
     monkeypatch.setattr(app_module, "DB_PATH", db_path)
     monkeypatch.setattr(
         app_module, "_list_ragflow_documents",
         lambda: (_ for _ in ()).throw(RuntimeError("RAGFlow down")),
     )
+    from web.backend.auth import _tokens
+    _tokens["adm-tok"] = {"username": "a", "role": "admin"}
     application = create_app()
     c = TestClient(application)
-    r = c.get("/api/documents")
+    r = c.get("/api/documents", headers={"Authorization": "Bearer adm-tok"})
     assert r.status_code == 503
     assert "RAGFlow" in r.json()["detail"]

@@ -55,6 +55,26 @@ def test_parse_missing_ok_defaults_pass():
     assert parse_check('{"reason": "x"}')["ok"] is True
 
 
+def test_parse_extracts_rewritten_query():
+    """不通过时 reflection 应输出 rewritten_query，供 retry 节点改写检索词。"""
+    r = parse_check('{"ok": false, "reason": "没标注来源", "rewritten_query": "国奖 申请条件 2025"}')
+    assert r["ok"] is False
+    assert r["rewritten_query"] == "国奖 申请条件 2025"
+
+
+def test_parse_rewritten_query_optional():
+    """通过时或 LLM 没给 rewritten_query 时，字段可以缺失，不影响流程。"""
+    r = parse_check('{"ok": true, "reason": "通过"}')
+    assert r["ok"] is True
+    assert r.get("rewritten_query") is None
+
+def test_build_check_prompt_includes_rewrite_instruction():
+    """质检 prompt 应要求 LLM 在不通过时给出 rewritten_query。"""
+    p = build_check_prompt("国奖条件", [], "答")
+    assert "rewritten_query" in p
+    assert "改写" in p or "检索词" in p
+
+
 # ---------- build_check_prompt ----------
 def test_prompt_includes_question_analysis_and_sources():
     chunks = [{"content": "资料A", "source": "通知-1.md"}, {"content": "资料B", "source": "办法-2.md"}]
