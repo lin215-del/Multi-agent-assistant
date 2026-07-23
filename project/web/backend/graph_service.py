@@ -45,6 +45,7 @@ def ask(question: str) -> dict:
         "reflection": None,
         "final": "",
         "round": 0,
+        "node_trace": [],
     }
     t0 = time.time()
     try:
@@ -63,6 +64,7 @@ def ask(question: str) -> dict:
             "round": 0,
             "latency_ms": elapsed,
             "error": str(exc),
+            "node_trace": [],
         }
 
 
@@ -78,4 +80,5 @@ def _trace_from_result(result: dict, elapsed_ms: int) -> dict:
         "round": int(result.get("round") or 0),
         "latency_ms": elapsed_ms,
         "error": None,
+        "node_trace": result.get("node_trace") or [],
     }

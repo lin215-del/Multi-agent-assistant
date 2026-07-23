@@ -53,7 +53,7 @@ def test_parse_empty_or_broken_response():
 def test_retriever_node_writes_retrieved(monkeypatch):
     monkeypatch.setattr(
         "agents.retriever.retrieve_chunks",
-        lambda q, did=None, top_k=8: parse_chunks(_FAKE_RESPONSE),
+        lambda q, did=None, top_k=6: parse_chunks(_FAKE_RESPONSE),
     )
     out = retriever_node({"query": "国家奖学金条件"})
     assert len(out["retrieved"]) == 2
@@ -63,9 +63,56 @@ def test_retriever_node_writes_retrieved(monkeypatch):
 def test_retriever_node_falls_back_to_question_when_no_query(monkeypatch):
     """query 没写（比如反思还没改写）时，退回用 question 检索。"""
     seen = {}
-    def fake(q, did=None, top_k=8):
+    def fake(q, did=None, top_k=6):
         seen["q"] = q
         return []
     monkeypatch.setattr("agents.retriever.retrieve_chunks", fake)
     retriever_node({"question": "奖学金条件", "query": None})
     assert seen["q"] == "奖学金条件"
+
+
+# ---------- retrieve_chunks 参数：三个 PDF 对齐的环境变量默认值 ----------
+def test_retrieve_chunks_passes_vector_similarity_weight(monkeypatch):
+    """JSON payload 应包含 vector_similarity_weight 字段。"""
+    payload = {}
+    def fake_post(url, **kw):
+        payload.update(kw.get("json", {}))
+        import requests as _r
+        resp = type("R", (), {"json": lambda self: {"data": {"chunks": []}}, "raise_for_status": lambda self: None})()
+        return resp
+    monkeypatch.setattr("agents.retriever.requests.post", fake_post)
+    monkeypatch.setitem(os.environ, "RAGFLOW_BASE_URL", "http://localhost")
+    monkeypatch.setitem(os.environ, "RAGFLOW_API_KEY", "sk-test")
+    from agents.retriever import retrieve_chunks
+    retrieve_chunks("测试")
+    assert "vector_similarity_weight" in payload
+    assert payload["vector_similarity_weight"] == 0.65
+
+
+def test_retrieve_chunks_uses_env_similarity_threshold(monkeypatch):
+    """设环境变量后 similarity_threshold 应从 env 读取。"""
+    payload = {}
+    def fake_post(url, **kw):
+        payload.update(kw.get("json", {}))
+        import requests as _r
+        resp = type("R", (), {"json": lambda self: {"data": {"chunks": []}}, "raise_for_status": lambda self: None})()
+        return resp
+    monkeypatch.setattr("agents.retriever.requests.post", fake_post)
+    monkeypatch.setitem(os.environ, "RAGFLOW_BASE_URL", "http://localhost")
+    monkeypatch.setitem(os.environ, "RAGFLOW_API_KEY", "sk-test")
+    monkeypatch.setitem(os.environ, "RAGFLOW_SIMILARITY_THRESHOLD", "0.5")
+    from agents.retriever import retrieve_chunks
+    retrieve_chunks("测试")
+    assert payload["similarity_threshold"] == 0.5
+
+
+def test_retrieve_chunks_uses_env_top_k(monkeypatch):
+    """设 RAGFLOW_TOP_K 后 DEFAULT_TOP_K 应反映环境变量值。"""
+    monkeypatch.setitem(os.environ, "RAGFLOW_TOP_K", "10")
+    from importlib import reload
+    import agents.retriever
+    reload(agents.retriever)
+    assert agents.retriever.DEFAULT_TOP_K == 10
+    # 恢复默认值，避免污染后续测试
+    monkeypatch.delenv("RAGFLOW_TOP_K")
+    reload(agents.retriever)

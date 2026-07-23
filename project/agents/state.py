@@ -38,3 +38,6 @@ class AgentState(TypedDict):
 
     round: int
     """反思循环当前第几轮，用来限制最大重试次数。"""
+
+    node_trace: list[dict]
+    """逐节点执行耗时记录：[{node: str, elapsed_ms: int}, ...]，调试 & 答辩用。"""

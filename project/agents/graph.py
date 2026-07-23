@@ -3,13 +3,16 @@
 流程：
   START → router
   router --route--> retrieve / tool / both / reject
-    retrieve → retriever → analyzer
+    retrieve → retriever → _after_retriever（score 闸门）→ analyzer / reject_node
     tool     → tool → analyzer
-    both     → tool → retriever → analyzer
+    both     → tool → retriever → _after_retriever → analyzer / reject_node
     reject   → reject_node → END
   analyzer → reflection
   reflection --ok?--> 通过→finalize；不通过且轮数<MAX→retry（重生成）；到上限→finalize（坦白）
 """
+import os
+import time
+
 from langgraph.graph import START, END, StateGraph
 
 from agents.analyzer import analyzer_node
@@ -64,6 +67,22 @@ def _after_tool(state):
     return "retriever" if state.get("route") == "both" else "analyzer"
 
 
+def _after_retriever(state):
+    """检索后质检：max chunk score 不够阈值时，纯检索路径拒答，both 路径放行（还有 tool_output 可用）。"""
+    retrieved = state.get("retrieved") or []
+    if not retrieved:
+        if state.get("route") == "both":
+            return "analyzer"
+        return "reject_node"
+    max_score = max(c.get("score", 0) for c in retrieved)
+    threshold = float(os.environ.get("RETRIEVAL_SCORE_THRESHOLD", "0.4"))
+    if max_score >= threshold:
+        return "analyzer"
+    if state.get("route") == "both":
+        return "analyzer"
+    return "reject_node"
+
+
 def _after_analyzer(state):
     # 纯工具计算路径：结果由代码算出，不需要反思质检，直接收尾
     if state.get("route") == "tool":
@@ -80,25 +99,38 @@ def _after_reflection(state):
     return "retry_node"
 
 
+def _traced(name, fn):
+    """给节点包一层计时：执行前后打点，耗时追加到 state["node_trace"]。"""
+    def wrapped(state):
+        t0 = time.time()
+        result = fn(state)
+        elapsed_ms = int((time.time() - t0) * 1000)
+        prev = state.get("node_trace") or []
+        result["node_trace"] = prev + [{"node": name, "elapsed_ms": elapsed_ms}]
+        return result
+    return wrapped
+
+
 def build_graph(router=None, retriever=None, analyzer=None, tool=None,
                 reflection=None, reject=None, finalize=None, retry=None):
     """建完整五节点图。参数允许注入假节点（测试用），默认用真节点。"""
     g = StateGraph(AgentState)
-    g.add_node("router", router or router_node)
-    g.add_node("retriever", retriever or retriever_node)
-    g.add_node("tool", tool or tool_node)
-    g.add_node("analyzer", analyzer or analyzer_node)
-    g.add_node("reflection", reflection or reflection_node)
-    g.add_node("reject_node", reject or reject_node)
-    g.add_node("finalize_node", finalize or finalize_node)
-    g.add_node("retry_node", retry or retry_node)
+    g.add_node("router", _traced("router", router or router_node))
+    g.add_node("retriever", _traced("retriever", retriever or retriever_node))
+    g.add_node("tool", _traced("tool", tool or tool_node))
+    g.add_node("analyzer", _traced("analyzer", analyzer or analyzer_node))
+    g.add_node("reflection", _traced("reflection", reflection or reflection_node))
+    g.add_node("reject_node", _traced("reject_node", reject or reject_node))
+    g.add_node("finalize_node", _traced("finalize_node", finalize or finalize_node))
+    g.add_node("retry_node", _traced("retry_node", retry or retry_node))
 
     g.add_edge(START, "router")
     g.add_conditional_edges("router", _after_router, {
         "retriever": "retriever", "tool": "tool", "reject_node": "reject_node"})
     g.add_conditional_edges("tool", _after_tool, {
         "retriever": "retriever", "analyzer": "analyzer"})
-    g.add_edge("retriever", "analyzer")
+    g.add_conditional_edges("retriever", _after_retriever, {
+        "analyzer": "analyzer", "reject_node": "reject_node"})
     g.add_conditional_edges("analyzer", _after_analyzer, {
         "reflection": "reflection", "finalize_node": "finalize_node"})
     g.add_conditional_edges("reflection", _after_reflection, {

@@ -27,7 +27,7 @@ def _make_app(route, reflection_seq, call_log):
 
     def retriever(state):
         call_log.append("retriever")
-        return {"retrieved": [{"content": "c", "source": "s.md"}]}
+        return {"retrieved": [{"content": "c", "source": "s.md", "score": 0.85}]}
 
     def analyzer(state):
         call_log.append("analyzer")
@@ -129,3 +129,39 @@ def test_max_rounds_gives_up():
     assert log.count("analyzer") == MAX_ROUNDS + 1
     assert log.count("retriever") == MAX_ROUNDS + 1  # 每次分析前都重新检索
     assert "把握不大" in result["final"]
+
+
+# ---------- 检索后相关度闸门 ----------
+def test_retriever_low_score_rejects():
+    """纯检索路径 score 不够阈值 → 直接拒答，不进 analyzer。"""
+    log = []
+    def retriever(state):
+        log.append("retriever")
+        return {"retrieved": [{"content": "c", "source": "s.md", "score": 0.3}]}
+    app = build_graph(
+        router=lambda s: (log.append("router"), {"route": "retrieve", "query": s["question"]})[1],
+        retriever=retriever,
+        analyzer=lambda s: (log.append("analyzer"), {"analysis": "ANS"})[1],
+        reflection=lambda s: (log.append("reflection"), {"reflection": {"ok": True, "reason": "ok"}})[1],
+    )
+    result = app.invoke({"question": "q"})
+    assert "范围" in result["final"] or "超出" in result["final"]
+    assert "analyzer" not in log
+
+
+def test_retriever_low_score_both_still_analyzes():
+    """both 路径 score 不够但有 tool_output → 仍进 analyzer（不浪费工具计算结果）。"""
+    log = []
+    def retriever(state):
+        log.append("retriever")
+        return {"retrieved": [{"content": "c", "source": "s.md", "score": 0.3}]}
+    app = build_graph(
+        router=lambda s: (log.append("router"), {"route": "both", "query": s["question"]})[1],
+        tool=lambda s: (log.append("tool"), {"tool_output": "TOOL"})[1],
+        retriever=retriever,
+        analyzer=lambda s: (log.append("analyzer"), {"analysis": "ANS"})[1],
+        reflection=lambda s: (log.append("reflection"), {"reflection": {"ok": True, "reason": "ok"}})[1],
+    )
+    result = app.invoke({"question": "q"})
+    assert "analyzer" in log
+    assert result["final"] == "ANS"

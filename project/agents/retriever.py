@@ -16,7 +16,7 @@ from agents.state import AgentState
 DATASET_ID = os.environ.get(
     "RAGFLOW_DATASET_ID", "a37fbd80835011f19401935c69409f04"
 )
-DEFAULT_TOP_K = 8
+DEFAULT_TOP_K = int(os.environ.get("RAGFLOW_TOP_K", "6"))
 
 
 def parse_chunks(api_response: dict) -> list[dict]:
@@ -45,7 +45,12 @@ def retrieve_chunks(query: str, dataset_id: str = DATASET_ID, top_k: int = DEFAU
             "dataset_ids": [dataset_id],
             "page": 1,
             "page_size": top_k,
-            "similarity_threshold": 0.2,
+            "similarity_threshold": float(
+                os.environ.get("RAGFLOW_SIMILARITY_THRESHOLD", "0.3")
+            ),
+            "vector_similarity_weight": float(
+                os.environ.get("RAGFLOW_VECTOR_SIMILARITY_WEIGHT", "0.65")
+            ),
         },
         timeout=30,
     )
