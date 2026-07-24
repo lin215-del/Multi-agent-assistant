@@ -1,0 +1,58 @@
+{
+  "id": "f95ef4c0833f11f1ac0a959490948c10",
+  "name": "暨南大学学生助手-实验B-中块800",
+  "description": "同一份清洗语料的分块实验 B：800 tokens，重叠 10%。",
+  "document_count": 180,
+  "chunk_count": 274,
+  "embedding_model": "BAAI/bge-m3@default1@OpenAI-API-Compatible",
+  "chunk_method": "naive",
+  "parser_config": {
+    "auto_keywords": 0,
+    "auto_questions": 0,
+    "children_delimiter": "",
+    "chunk_token_num": 512,
+    "delimiter": "\n",
+    "graphrag": {
+      "batch_chunk_token_size": 4096,
+      "build_subgraph_min_timeout_seconds": 600,
+      "build_subgraph_timeout_per_chunk_seconds": 300,
+      "community_timeout_seconds": 1800,
+      "entity_types": [
+        "organization",
+        "person",
+        "geo",
+        "event",
+        "category"
+      ],
+      "lock_acquire_timeout_seconds": 600,
+      "merge_timeout_seconds": 180,
+      "method": "light",
+      "resolution_timeout_seconds": 1800,
+      "retry_attempts": 2,
+      "retry_backoff_max_seconds": 60.0,
+      "retry_backoff_seconds": 2.0,
+      "use_graphrag": true
+    },
+    "html4excel": false,
+    "image_context_size": 0,
+    "layout_recognize": "DeepDOC",
+    "llm_id": "Qwen/Qwen2.5-7B-Instruct@default1@OpenAI-API-Compatible",
+    "parent_child": {
+      "children_delimiter": "\n",
+      "use_parent_child": false
+    },
+    "raptor": {
+      "max_cluster": 64,
+      "max_token": 256,
+      "prompt": "Please summarize the following paragraphs. Be careful with the numbers, do not make things up. Paragraphs as following:\n      {cluster_content}\nThe above is the content you need to summarize.",
+      "random_seed": 0,
+      "threshold": 0.1,
+      "use_raptor": true
+    },
+    "table_context_size": 0,
+    "topn_tags": 3
+  },
+  "pipeline_id": "f953b1a0833f11f1ac0a959490948c10",
+  "create_date": "2026-07-19T15:03:41",
+  "update_date": "2026-07-19T20:22:50"
+}

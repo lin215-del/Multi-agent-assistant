@@ -1,0 +1,16 @@
+__pycache__/
+**/__pycache__/
+.venv/
+*.pyc
+*.pyo
+*.log
+.env
+.env.*
+!.env.example
+data/raw/
+data/files/
+data/cleaned/
+data/feedback/
+outputs/
+tmp/
+!.gitkeep

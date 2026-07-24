@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-07-23 19:59:35",
+  "dataset_name": "暨南大学学生助手-核心服务卡片",
+  "dataset_id": "d1f69a50843e11f1b9d46fc728574c05",
+  "document_count": 34,
+  "chunk_count": 53,
+  "vector_similarity_weight": 0.7,
+  "full_text_weight": 0.3,
+  "similarity_threshold": 0.575,
+  "top_k": 20,
+  "page_size": 3,
+  "keyword": true,
+  "cross_languages": [],
+  "metadata_condition": null,
+  "use_kg": false,
+  "rerank_id": null,
+  "validation_metrics": {
+    "threshold": 0.575,
+    "objective": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "mrr": 1.0,
+    "negative_rejection_rate": 1.0,
+    "positive_details": [
+      {
+        "case_id": "leave_of_absence:v0",
+        "query": "本科生因病休学要经过哪些部门办理？",
+        "rank": 1,
+        "top_document": "本科生休学流程.md",
+        "top_score": 0.7302440238166994
+      },
+      {
+        "case_id": "resume_study:v0",
+        "query": "休学期满后怎样申请复学？",
+        "rank": 1,
+        "top_document": "本科生复学流程.md",
+        "top_score": 0.7387856848589902
+      },
+      {
+        "case_id": "student_leave_form:v0",
+        "query": "本科生请假申请表在哪里下载，需要谁审批？",
+        "rank": 1,
+        "top_document": "本科生请假申请表.md",
+        "top_score": 0.689351782333973
+      },
+      {
+        "case_id": "withdrawal_process:v0",
+        "query": "本科生办理退学要走什么流程？",
+        "rank": 1,
+        "top_document": "本科生退学流程.md",
+        "top_score": 0.7309478574829859
+      }
+    ],
+    "negative_details": [
+      {
+        "case_id": "dorm_aircon:v0",
+        "query": "学生宿舍空调坏了应该打哪个维修电话？",
+        "rejected": true,
+        "top_document": "校园网学生申请.md",
+        "top_score": 0.567893038767098
+      },
+      {
+        "case_id": "swimming_pool:v0",
+        "query": "学校游泳馆今天几点开放？",
+        "rejected": true,
+        "top_document": "暑期课程选课缴费.md",
+        "top_score": 0.5385290035599666
+      }
+    ]
+  },
+  "score_separation": {
+    "minimum_relevant_positive_score": 0.689351782333973,
+    "maximum_negative_top_score": 0.567893038767098,
+    "margin": 0.12145874356687503
+  },
+  "selection_reason": "基础召回已达到最佳指标，Rerank 未带来足够收益。",
+  "rerank_objective_gain": 0.0
+}

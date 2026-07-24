@@ -1,0 +1,21 @@
+services:
+  student-assistant:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+      - path: .env.local
+        required: false
+    ports:
+      - "8090:8090"
+    environment:
+      ALLOW_PRIVATE_RAGFLOW: "1"
+      ASSISTANT_HOST: "0.0.0.0"
+      ASSISTANT_PORT: "8090"
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./knowledge_base:/app/knowledge_base:ro
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

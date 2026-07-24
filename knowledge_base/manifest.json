@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "exported_at": "2026-07-20T20:27:15+08:00",
+  "source": "RAGFlow REST API",
+  "dataset_count": 5,
+  "document_count": 692,
+  "chunk_count": 1138,
+  "image_chunk_count": 78,
+  "datasets": [
+    {
+      "id": "ea25d7f8833f11f1ac0a959490948c10",
+      "name": "暨南大学学生助手-实验A-小块500",
+      "documents": 180,
+      "chunks": 309,
+      "image_chunks": 26,
+      "errors": [],
+      "path": "datasets/ea25d7f8833f11f1ac0a959490948c10"
+    },
+    {
+      "id": "f95ef4c0833f11f1ac0a959490948c10",
+      "name": "暨南大学学生助手-实验B-中块800",
+      "documents": 180,
+      "chunks": 274,
+      "image_chunks": 26,
+      "errors": [],
+      "path": "datasets/f95ef4c0833f11f1ac0a959490948c10"
+    },
+    {
+      "id": "fc465e94833f11f1ac0a959490948c10",
+      "name": "暨南大学学生助手-实验C-上下文1200",
+      "documents": 180,
+      "chunks": 260,
+      "image_chunks": 26,
+      "errors": [],
+      "path": "datasets/fc465e94833f11f1ac0a959490948c10"
+    },
+    {
+      "id": "74fcf47a82a911f1b5b53f83b25d89d3",
+      "name": "暨南大学学生助手-核心服务卡片",
+      "documents": 34,
+      "chunks": 47,
+      "image_chunks": 0,
+      "errors": [],
+      "path": "datasets/74fcf47a82a911f1b5b53f83b25d89d3"
+    },
+    {
+      "id": "683cdc4a82a511f1b2e527d9437de36f",
+      "name": "暨南大学学生助手-第一阶段",
+      "documents": 118,
+      "chunks": 248,
+      "image_chunks": 0,
+      "errors": [],
+      "path": "datasets/683cdc4a82a511f1b2e527d9437de36f"
+    }
+  ]
+}

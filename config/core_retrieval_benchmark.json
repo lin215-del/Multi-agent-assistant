@@ -1,0 +1,1381 @@
+{
+  "version": "2.0",
+  "description": "由40个独立意图扩展出的160条正式核心知识库检索问法；训练验证按意图隔离。",
+  "source_intents": 40,
+  "positive_cases": [
+    {
+      "id": "leave_of_absence:v0",
+      "query": "本科生因病休学要经过哪些部门办理？",
+      "relevant_patterns": [
+        "休学"
+      ],
+      "intent_id": "leave_of_absence",
+      "variant": 0
+    },
+    {
+      "id": "leave_of_absence:v1",
+      "query": "请问本科生因病休学要经过哪些部门办理？",
+      "relevant_patterns": [
+        "休学"
+      ],
+      "intent_id": "leave_of_absence",
+      "variant": 1
+    },
+    {
+      "id": "leave_of_absence:v2",
+      "query": "我是暨大学生，想了解本科生因病休学要经过哪些部门办理。",
+      "relevant_patterns": [
+        "休学"
+      ],
+      "intent_id": "leave_of_absence",
+      "variant": 2
+    },
+    {
+      "id": "leave_of_absence:v3",
+      "query": "本科生因病休学要经过哪些部门办理，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "休学"
+      ],
+      "intent_id": "leave_of_absence",
+      "variant": 3
+    },
+    {
+      "id": "resume_study:v0",
+      "query": "休学期满后怎样申请复学？",
+      "relevant_patterns": [
+        "复学"
+      ],
+      "intent_id": "resume_study",
+      "variant": 0
+    },
+    {
+      "id": "resume_study:v1",
+      "query": "请问休学期满后怎样申请复学？",
+      "relevant_patterns": [
+        "复学"
+      ],
+      "intent_id": "resume_study",
+      "variant": 1
+    },
+    {
+      "id": "resume_study:v2",
+      "query": "我是暨大学生，想了解休学期满后怎样申请复学。",
+      "relevant_patterns": [
+        "复学"
+      ],
+      "intent_id": "resume_study",
+      "variant": 2
+    },
+    {
+      "id": "resume_study:v3",
+      "query": "休学期满后怎样申请复学，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "复学"
+      ],
+      "intent_id": "resume_study",
+      "variant": 3
+    },
+    {
+      "id": "student_leave_form:v0",
+      "query": "本科生请假申请表在哪里下载，需要谁审批？",
+      "relevant_patterns": [
+        "请假"
+      ],
+      "intent_id": "student_leave_form",
+      "variant": 0
+    },
+    {
+      "id": "student_leave_form:v1",
+      "query": "请问本科生请假申请表在哪里下载，需要谁审批？",
+      "relevant_patterns": [
+        "请假"
+      ],
+      "intent_id": "student_leave_form",
+      "variant": 1
+    },
+    {
+      "id": "student_leave_form:v2",
+      "query": "我是暨大学生，想了解本科生请假申请表在哪里下载，需要谁审批。",
+      "relevant_patterns": [
+        "请假"
+      ],
+      "intent_id": "student_leave_form",
+      "variant": 2
+    },
+    {
+      "id": "student_leave_form:v3",
+      "query": "本科生请假申请表在哪里下载，需要谁审批，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "请假"
+      ],
+      "intent_id": "student_leave_form",
+      "variant": 3
+    },
+    {
+      "id": "withdrawal_process:v0",
+      "query": "本科生办理退学要走什么流程？",
+      "relevant_patterns": [
+        "退学"
+      ],
+      "intent_id": "withdrawal_process",
+      "variant": 0
+    },
+    {
+      "id": "withdrawal_process:v1",
+      "query": "请问本科生办理退学要走什么流程？",
+      "relevant_patterns": [
+        "退学"
+      ],
+      "intent_id": "withdrawal_process",
+      "variant": 1
+    },
+    {
+      "id": "withdrawal_process:v2",
+      "query": "我是暨大学生，想了解本科生办理退学要走什么流程。",
+      "relevant_patterns": [
+        "退学"
+      ],
+      "intent_id": "withdrawal_process",
+      "variant": 2
+    },
+    {
+      "id": "withdrawal_process:v3",
+      "query": "本科生办理退学要走什么流程，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "退学"
+      ],
+      "intent_id": "withdrawal_process",
+      "variant": 3
+    },
+    {
+      "id": "withdrawal_form:v0",
+      "query": "主动退学申请表需要填写哪些内容？",
+      "relevant_patterns": [
+        "主动退学申请表"
+      ],
+      "intent_id": "withdrawal_form",
+      "variant": 0
+    },
+    {
+      "id": "withdrawal_form:v1",
+      "query": "请问主动退学申请表需要填写哪些内容？",
+      "relevant_patterns": [
+        "主动退学申请表"
+      ],
+      "intent_id": "withdrawal_form",
+      "variant": 1
+    },
+    {
+      "id": "withdrawal_form:v2",
+      "query": "我是暨大学生，想了解主动退学申请表需要填写哪些内容。",
+      "relevant_patterns": [
+        "主动退学申请表"
+      ],
+      "intent_id": "withdrawal_form",
+      "variant": 2
+    },
+    {
+      "id": "withdrawal_form:v3",
+      "query": "主动退学申请表需要填写哪些内容，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "主动退学申请表"
+      ],
+      "intent_id": "withdrawal_form",
+      "variant": 3
+    },
+    {
+      "id": "student_card:v0",
+      "query": "学生证丢失以后如何补办？",
+      "relevant_patterns": [
+        "学生证补办",
+        "遗失学生证补办"
+      ],
+      "intent_id": "student_card",
+      "variant": 0
+    },
+    {
+      "id": "student_card:v1",
+      "query": "请问学生证丢失以后如何补办？",
+      "relevant_patterns": [
+        "学生证补办",
+        "遗失学生证补办"
+      ],
+      "intent_id": "student_card",
+      "variant": 1
+    },
+    {
+      "id": "student_card:v2",
+      "query": "我是暨大学生，想了解学生证丢失以后如何补办。",
+      "relevant_patterns": [
+        "学生证补办",
+        "遗失学生证补办"
+      ],
+      "intent_id": "student_card",
+      "variant": 2
+    },
+    {
+      "id": "student_card:v3",
+      "query": "学生证丢失以后如何补办，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "学生证补办",
+        "遗失学生证补办"
+      ],
+      "intent_id": "student_card",
+      "variant": 3
+    },
+    {
+      "id": "transcript:v0",
+      "query": "中英文成绩单和在学证明在哪里打印？",
+      "relevant_patterns": [
+        "成绩单",
+        "在学证明"
+      ],
+      "intent_id": "transcript",
+      "variant": 0
+    },
+    {
+      "id": "transcript:v1",
+      "query": "请问中英文成绩单和在学证明在哪里打印？",
+      "relevant_patterns": [
+        "成绩单",
+        "在学证明"
+      ],
+      "intent_id": "transcript",
+      "variant": 1
+    },
+    {
+      "id": "transcript:v2",
+      "query": "我是暨大学生，想了解中英文成绩单和在学证明在哪里打印。",
+      "relevant_patterns": [
+        "成绩单",
+        "在学证明"
+      ],
+      "intent_id": "transcript",
+      "variant": 2
+    },
+    {
+      "id": "transcript:v3",
+      "query": "中英文成绩单和在学证明在哪里打印，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "成绩单",
+        "在学证明"
+      ],
+      "intent_id": "transcript",
+      "variant": 3
+    },
+    {
+      "id": "diploma_reissue:v0",
+      "query": "毕业证书遗失了如何补办证明？",
+      "relevant_patterns": [
+        "毕业证书遗失补办"
+      ],
+      "intent_id": "diploma_reissue",
+      "variant": 0
+    },
+    {
+      "id": "diploma_reissue:v1",
+      "query": "请问毕业证书遗失了如何补办证明？",
+      "relevant_patterns": [
+        "毕业证书遗失补办"
+      ],
+      "intent_id": "diploma_reissue",
+      "variant": 1
+    },
+    {
+      "id": "diploma_reissue:v2",
+      "query": "我是暨大学生，想了解毕业证书遗失了如何补办证明。",
+      "relevant_patterns": [
+        "毕业证书遗失补办"
+      ],
+      "intent_id": "diploma_reissue",
+      "variant": 2
+    },
+    {
+      "id": "diploma_reissue:v3",
+      "query": "毕业证书遗失了如何补办证明，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "毕业证书遗失补办"
+      ],
+      "intent_id": "diploma_reissue",
+      "variant": 3
+    },
+    {
+      "id": "degree_reissue:v0",
+      "query": "学位证书丢失后怎样申请补办？",
+      "relevant_patterns": [
+        "学位证书遗失补办"
+      ],
+      "intent_id": "degree_reissue",
+      "variant": 0
+    },
+    {
+      "id": "degree_reissue:v1",
+      "query": "请问学位证书丢失后怎样申请补办？",
+      "relevant_patterns": [
+        "学位证书遗失补办"
+      ],
+      "intent_id": "degree_reissue",
+      "variant": 1
+    },
+    {
+      "id": "degree_reissue:v2",
+      "query": "我是暨大学生，想了解学位证书丢失后怎样申请补办。",
+      "relevant_patterns": [
+        "学位证书遗失补办"
+      ],
+      "intent_id": "degree_reissue",
+      "variant": 2
+    },
+    {
+      "id": "degree_reissue:v3",
+      "query": "学位证书丢失后怎样申请补办，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "学位证书遗失补办"
+      ],
+      "intent_id": "degree_reissue",
+      "variant": 3
+    },
+    {
+      "id": "degree_certificate:v0",
+      "query": "学士学位证明书申请表要填写什么个人信息？",
+      "relevant_patterns": [
+        "学士学位证明书"
+      ],
+      "intent_id": "degree_certificate",
+      "variant": 0
+    },
+    {
+      "id": "degree_certificate:v1",
+      "query": "请问学士学位证明书申请表要填写什么个人信息？",
+      "relevant_patterns": [
+        "学士学位证明书"
+      ],
+      "intent_id": "degree_certificate",
+      "variant": 1
+    },
+    {
+      "id": "degree_certificate:v2",
+      "query": "我是暨大学生，想了解学士学位证明书申请表要填写什么个人信息。",
+      "relevant_patterns": [
+        "学士学位证明书"
+      ],
+      "intent_id": "degree_certificate",
+      "variant": 2
+    },
+    {
+      "id": "degree_certificate:v3",
+      "query": "学士学位证明书申请表要填写什么个人信息，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "学士学位证明书"
+      ],
+      "intent_id": "degree_certificate",
+      "variant": 3
+    },
+    {
+      "id": "major_transfer:v0",
+      "query": "申请转专业需要准备什么材料和审核？",
+      "relevant_patterns": [
+        "转专业"
+      ],
+      "intent_id": "major_transfer",
+      "variant": 0
+    },
+    {
+      "id": "major_transfer:v1",
+      "query": "请问申请转专业需要准备什么材料和审核？",
+      "relevant_patterns": [
+        "转专业"
+      ],
+      "intent_id": "major_transfer",
+      "variant": 1
+    },
+    {
+      "id": "major_transfer:v2",
+      "query": "我是暨大学生，想了解申请转专业需要准备什么材料和审核。",
+      "relevant_patterns": [
+        "转专业"
+      ],
+      "intent_id": "major_transfer",
+      "variant": 2
+    },
+    {
+      "id": "major_transfer:v3",
+      "query": "申请转专业需要准备什么材料和审核，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "转专业"
+      ],
+      "intent_id": "major_transfer",
+      "variant": 3
+    },
+    {
+      "id": "exchange_credit:v0",
+      "query": "交换生回校后怎样办理课程和学分转换？",
+      "relevant_patterns": [
+        "交换生",
+        "学分转换"
+      ],
+      "intent_id": "exchange_credit",
+      "variant": 0
+    },
+    {
+      "id": "exchange_credit:v1",
+      "query": "请问交换生回校后怎样办理课程和学分转换？",
+      "relevant_patterns": [
+        "交换生",
+        "学分转换"
+      ],
+      "intent_id": "exchange_credit",
+      "variant": 1
+    },
+    {
+      "id": "exchange_credit:v2",
+      "query": "我是暨大学生，想了解交换生回校后怎样办理课程和学分转换。",
+      "relevant_patterns": [
+        "交换生",
+        "学分转换"
+      ],
+      "intent_id": "exchange_credit",
+      "variant": 2
+    },
+    {
+      "id": "exchange_credit:v3",
+      "query": "交换生回校后怎样办理课程和学分转换，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "交换生",
+        "学分转换"
+      ],
+      "intent_id": "exchange_credit",
+      "variant": 3
+    },
+    {
+      "id": "innovation_credit:v0",
+      "query": "创新学分申请表从哪里获取？",
+      "relevant_patterns": [
+        "创新学分"
+      ],
+      "intent_id": "innovation_credit",
+      "variant": 0
+    },
+    {
+      "id": "innovation_credit:v1",
+      "query": "请问创新学分申请表从哪里获取？",
+      "relevant_patterns": [
+        "创新学分"
+      ],
+      "intent_id": "innovation_credit",
+      "variant": 1
+    },
+    {
+      "id": "innovation_credit:v2",
+      "query": "我是暨大学生，想了解创新学分申请表从哪里获取。",
+      "relevant_patterns": [
+        "创新学分"
+      ],
+      "intent_id": "innovation_credit",
+      "variant": 2
+    },
+    {
+      "id": "innovation_credit:v3",
+      "query": "创新学分申请表从哪里获取，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "创新学分"
+      ],
+      "intent_id": "innovation_credit",
+      "variant": 3
+    },
+    {
+      "id": "summer_course:v0",
+      "query": "暑期课程什么时候选课和缴费？",
+      "relevant_patterns": [
+        "暑期课程选课缴费",
+        "暑期课程选课与缴费"
+      ],
+      "intent_id": "summer_course",
+      "variant": 0
+    },
+    {
+      "id": "summer_course:v1",
+      "query": "请问暑期课程什么时候选课和缴费？",
+      "relevant_patterns": [
+        "暑期课程选课缴费",
+        "暑期课程选课与缴费"
+      ],
+      "intent_id": "summer_course",
+      "variant": 1
+    },
+    {
+      "id": "summer_course:v2",
+      "query": "我是暨大学生，想了解暑期课程什么时候选课和缴费。",
+      "relevant_patterns": [
+        "暑期课程选课缴费",
+        "暑期课程选课与缴费"
+      ],
+      "intent_id": "summer_course",
+      "variant": 2
+    },
+    {
+      "id": "summer_course:v3",
+      "query": "暑期课程什么时候选课和缴费，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "暑期课程选课缴费",
+        "暑期课程选课与缴费"
+      ],
+      "intent_id": "summer_course",
+      "variant": 3
+    },
+    {
+      "id": "course_selection:v0",
+      "query": "本科生选课的操作流程是什么？",
+      "relevant_patterns": [
+        "学生选课流程"
+      ],
+      "intent_id": "course_selection",
+      "variant": 0
+    },
+    {
+      "id": "course_selection:v1",
+      "query": "请问本科生选课的操作流程是什么？",
+      "relevant_patterns": [
+        "学生选课流程"
+      ],
+      "intent_id": "course_selection",
+      "variant": 1
+    },
+    {
+      "id": "course_selection:v2",
+      "query": "我是暨大学生，想了解本科生选课的操作流程是什么。",
+      "relevant_patterns": [
+        "学生选课流程"
+      ],
+      "intent_id": "course_selection",
+      "variant": 2
+    },
+    {
+      "id": "course_selection:v3",
+      "query": "本科生选课的操作流程是什么，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "学生选课流程"
+      ],
+      "intent_id": "course_selection",
+      "variant": 3
+    },
+    {
+      "id": "graduation_internship:v0",
+      "query": "本科毕业实习需要完成哪些步骤？",
+      "relevant_patterns": [
+        "毕业实习"
+      ],
+      "intent_id": "graduation_internship",
+      "variant": 0
+    },
+    {
+      "id": "graduation_internship:v1",
+      "query": "请问本科毕业实习需要完成哪些步骤？",
+      "relevant_patterns": [
+        "毕业实习"
+      ],
+      "intent_id": "graduation_internship",
+      "variant": 1
+    },
+    {
+      "id": "graduation_internship:v2",
+      "query": "我是暨大学生，想了解本科毕业实习需要完成哪些步骤。",
+      "relevant_patterns": [
+        "毕业实习"
+      ],
+      "intent_id": "graduation_internship",
+      "variant": 2
+    },
+    {
+      "id": "graduation_internship:v3",
+      "query": "本科毕业实习需要完成哪些步骤，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "毕业实习"
+      ],
+      "intent_id": "graduation_internship",
+      "variant": 3
+    },
+    {
+      "id": "practice_agreement:v0",
+      "query": "实践教育基地协议模板在哪里下载？",
+      "relevant_patterns": [
+        "实践教育基地协议"
+      ],
+      "intent_id": "practice_agreement",
+      "variant": 0
+    },
+    {
+      "id": "practice_agreement:v1",
+      "query": "请问实践教育基地协议模板在哪里下载？",
+      "relevant_patterns": [
+        "实践教育基地协议"
+      ],
+      "intent_id": "practice_agreement",
+      "variant": 1
+    },
+    {
+      "id": "practice_agreement:v2",
+      "query": "我是暨大学生，想了解实践教育基地协议模板在哪里下载。",
+      "relevant_patterns": [
+        "实践教育基地协议"
+      ],
+      "intent_id": "practice_agreement",
+      "variant": 2
+    },
+    {
+      "id": "practice_agreement:v3",
+      "query": "实践教育基地协议模板在哪里下载，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "实践教育基地协议"
+      ],
+      "intent_id": "practice_agreement",
+      "variant": 3
+    },
+    {
+      "id": "retain_admission:v0",
+      "query": "新生怎样申请保留入学资格？",
+      "relevant_patterns": [
+        "保留入学资格"
+      ],
+      "intent_id": "retain_admission",
+      "variant": 0
+    },
+    {
+      "id": "retain_admission:v1",
+      "query": "请问新生怎样申请保留入学资格？",
+      "relevant_patterns": [
+        "保留入学资格"
+      ],
+      "intent_id": "retain_admission",
+      "variant": 1
+    },
+    {
+      "id": "retain_admission:v2",
+      "query": "我是暨大学生，想了解新生怎样申请保留入学资格。",
+      "relevant_patterns": [
+        "保留入学资格"
+      ],
+      "intent_id": "retain_admission",
+      "variant": 2
+    },
+    {
+      "id": "retain_admission:v3",
+      "query": "新生怎样申请保留入学资格，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "保留入学资格"
+      ],
+      "intent_id": "retain_admission",
+      "variant": 3
+    },
+    {
+      "id": "waive_admission:v0",
+      "query": "新生放弃入学资格要提交什么表格？",
+      "relevant_patterns": [
+        "放弃入学资格"
+      ],
+      "intent_id": "waive_admission",
+      "variant": 0
+    },
+    {
+      "id": "waive_admission:v1",
+      "query": "请问新生放弃入学资格要提交什么表格？",
+      "relevant_patterns": [
+        "放弃入学资格"
+      ],
+      "intent_id": "waive_admission",
+      "variant": 1
+    },
+    {
+      "id": "waive_admission:v2",
+      "query": "我是暨大学生，想了解新生放弃入学资格要提交什么表格。",
+      "relevant_patterns": [
+        "放弃入学资格"
+      ],
+      "intent_id": "waive_admission",
+      "variant": 2
+    },
+    {
+      "id": "waive_admission:v3",
+      "query": "新生放弃入学资格要提交什么表格，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "放弃入学资格"
+      ],
+      "intent_id": "waive_admission",
+      "variant": 3
+    },
+    {
+      "id": "freshman_correction:v0",
+      "query": "新生个人信息有错误应该怎样勘误？",
+      "relevant_patterns": [
+        "新生个人信息勘误"
+      ],
+      "intent_id": "freshman_correction",
+      "variant": 0
+    },
+    {
+      "id": "freshman_correction:v1",
+      "query": "请问新生个人信息有错误应该怎样勘误？",
+      "relevant_patterns": [
+        "新生个人信息勘误"
+      ],
+      "intent_id": "freshman_correction",
+      "variant": 1
+    },
+    {
+      "id": "freshman_correction:v2",
+      "query": "我是暨大学生，想了解新生个人信息有错误应该怎样勘误。",
+      "relevant_patterns": [
+        "新生个人信息勘误"
+      ],
+      "intent_id": "freshman_correction",
+      "variant": 2
+    },
+    {
+      "id": "freshman_correction:v3",
+      "query": "新生个人信息有错误应该怎样勘误，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "新生个人信息勘误"
+      ],
+      "intent_id": "freshman_correction",
+      "variant": 3
+    },
+    {
+      "id": "calendar:v0",
+      "query": "暨南大学校历在哪里查看？",
+      "relevant_patterns": [
+        "校历查询",
+        "校历"
+      ],
+      "intent_id": "calendar",
+      "variant": 0
+    },
+    {
+      "id": "calendar:v1",
+      "query": "请问暨南大学校历在哪里查看？",
+      "relevant_patterns": [
+        "校历查询",
+        "校历"
+      ],
+      "intent_id": "calendar",
+      "variant": 1
+    },
+    {
+      "id": "calendar:v2",
+      "query": "我是暨大学生，想了解暨南大学校历在哪里查看。",
+      "relevant_patterns": [
+        "校历查询",
+        "校历"
+      ],
+      "intent_id": "calendar",
+      "variant": 2
+    },
+    {
+      "id": "calendar:v3",
+      "query": "暨南大学校历在哪里查看，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "校历查询",
+        "校历"
+      ],
+      "intent_id": "calendar",
+      "variant": 3
+    },
+    {
+      "id": "shuttle_bus:v0",
+      "query": "校本部到番禺校区的教学班车时间怎么查？",
+      "relevant_patterns": [
+        "教学班车"
+      ],
+      "intent_id": "shuttle_bus",
+      "variant": 0
+    },
+    {
+      "id": "shuttle_bus:v1",
+      "query": "请问校本部到番禺校区的教学班车时间怎么查？",
+      "relevant_patterns": [
+        "教学班车"
+      ],
+      "intent_id": "shuttle_bus",
+      "variant": 1
+    },
+    {
+      "id": "shuttle_bus:v2",
+      "query": "我是暨大学生，想了解校本部到番禺校区的教学班车时间怎么查。",
+      "relevant_patterns": [
+        "教学班车"
+      ],
+      "intent_id": "shuttle_bus",
+      "variant": 2
+    },
+    {
+      "id": "shuttle_bus:v3",
+      "query": "校本部到番禺校区的教学班车时间怎么查，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "教学班车"
+      ],
+      "intent_id": "shuttle_bus",
+      "variant": 3
+    },
+    {
+      "id": "campus_network:v0",
+      "query": "学生校园网账号如何申请和缴费？",
+      "relevant_patterns": [
+        "校园网"
+      ],
+      "intent_id": "campus_network",
+      "variant": 0
+    },
+    {
+      "id": "campus_network:v1",
+      "query": "请问学生校园网账号如何申请和缴费？",
+      "relevant_patterns": [
+        "校园网"
+      ],
+      "intent_id": "campus_network",
+      "variant": 1
+    },
+    {
+      "id": "campus_network:v2",
+      "query": "我是暨大学生，想了解学生校园网账号如何申请和缴费。",
+      "relevant_patterns": [
+        "校园网"
+      ],
+      "intent_id": "campus_network",
+      "variant": 2
+    },
+    {
+      "id": "campus_network:v3",
+      "query": "学生校园网账号如何申请和缴费，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "校园网"
+      ],
+      "intent_id": "campus_network",
+      "variant": 3
+    },
+    {
+      "id": "campus_card:v0",
+      "query": "校园卡有哪些充值方式？",
+      "relevant_patterns": [
+        "校园卡充值"
+      ],
+      "intent_id": "campus_card",
+      "variant": 0
+    },
+    {
+      "id": "campus_card:v1",
+      "query": "请问校园卡有哪些充值方式？",
+      "relevant_patterns": [
+        "校园卡充值"
+      ],
+      "intent_id": "campus_card",
+      "variant": 1
+    },
+    {
+      "id": "campus_card:v2",
+      "query": "我是暨大学生，想了解校园卡有哪些充值方式。",
+      "relevant_patterns": [
+        "校园卡充值"
+      ],
+      "intent_id": "campus_card",
+      "variant": 2
+    },
+    {
+      "id": "campus_card:v3",
+      "query": "校园卡有哪些充值方式，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "校园卡充值"
+      ],
+      "intent_id": "campus_card",
+      "variant": 3
+    },
+    {
+      "id": "library_renewal:v0",
+      "query": "借阅的图书怎样续借或预约？",
+      "relevant_patterns": [
+        "图书续借",
+        "续借和预约"
+      ],
+      "intent_id": "library_renewal",
+      "variant": 0
+    },
+    {
+      "id": "library_renewal:v1",
+      "query": "请问借阅的图书怎样续借或预约？",
+      "relevant_patterns": [
+        "图书续借",
+        "续借和预约"
+      ],
+      "intent_id": "library_renewal",
+      "variant": 1
+    },
+    {
+      "id": "library_renewal:v2",
+      "query": "我是暨大学生，想了解借阅的图书怎样续借或预约。",
+      "relevant_patterns": [
+        "图书续借",
+        "续借和预约"
+      ],
+      "intent_id": "library_renewal",
+      "variant": 2
+    },
+    {
+      "id": "library_renewal:v3",
+      "query": "借阅的图书怎样续借或预约，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "图书续借",
+        "续借和预约"
+      ],
+      "intent_id": "library_renewal",
+      "variant": 3
+    },
+    {
+      "id": "canteen_hours:v0",
+      "query": "番禺校区食堂几点营业？",
+      "relevant_patterns": [
+        "番禺校区食堂营业时间",
+        "食堂营业时间"
+      ],
+      "intent_id": "canteen_hours",
+      "variant": 0
+    },
+    {
+      "id": "canteen_hours:v1",
+      "query": "请问番禺校区食堂几点营业？",
+      "relevant_patterns": [
+        "番禺校区食堂营业时间",
+        "食堂营业时间"
+      ],
+      "intent_id": "canteen_hours",
+      "variant": 1
+    },
+    {
+      "id": "canteen_hours:v2",
+      "query": "我是暨大学生，想了解番禺校区食堂几点营业。",
+      "relevant_patterns": [
+        "番禺校区食堂营业时间",
+        "食堂营业时间"
+      ],
+      "intent_id": "canteen_hours",
+      "variant": 2
+    },
+    {
+      "id": "canteen_hours:v3",
+      "query": "番禺校区食堂几点营业，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "番禺校区食堂营业时间",
+        "食堂营业时间"
+      ],
+      "intent_id": "canteen_hours",
+      "variant": 3
+    },
+    {
+      "id": "medical_service:v0",
+      "query": "学生公费医疗业务在哪里办理？",
+      "relevant_patterns": [
+        "公费医疗"
+      ],
+      "intent_id": "medical_service",
+      "variant": 0
+    },
+    {
+      "id": "medical_service:v1",
+      "query": "请问学生公费医疗业务在哪里办理？",
+      "relevant_patterns": [
+        "公费医疗"
+      ],
+      "intent_id": "medical_service",
+      "variant": 1
+    },
+    {
+      "id": "medical_service:v2",
+      "query": "我是暨大学生，想了解学生公费医疗业务在哪里办理。",
+      "relevant_patterns": [
+        "公费医疗"
+      ],
+      "intent_id": "medical_service",
+      "variant": 2
+    },
+    {
+      "id": "medical_service:v3",
+      "query": "学生公费医疗业务在哪里办理，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "公费医疗"
+      ],
+      "intent_id": "medical_service",
+      "variant": 3
+    },
+    {
+      "id": "employment:v0",
+      "query": "毕业生就业手续应该从哪里办理？",
+      "relevant_patterns": [
+        "毕业生就业手续"
+      ],
+      "intent_id": "employment",
+      "variant": 0
+    },
+    {
+      "id": "employment:v1",
+      "query": "请问毕业生就业手续应该从哪里办理？",
+      "relevant_patterns": [
+        "毕业生就业手续"
+      ],
+      "intent_id": "employment",
+      "variant": 1
+    },
+    {
+      "id": "employment:v2",
+      "query": "我是暨大学生，想了解毕业生就业手续应该从哪里办理。",
+      "relevant_patterns": [
+        "毕业生就业手续"
+      ],
+      "intent_id": "employment",
+      "variant": 2
+    },
+    {
+      "id": "employment:v3",
+      "query": "毕业生就业手续应该从哪里办理，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "毕业生就业手续"
+      ],
+      "intent_id": "employment",
+      "variant": 3
+    },
+    {
+      "id": "postgraduate_recommendation:v0",
+      "query": "本科生推免申请从哪里报名？",
+      "relevant_patterns": [
+        "推免申请",
+        "推荐免试"
+      ],
+      "intent_id": "postgraduate_recommendation",
+      "variant": 0
+    },
+    {
+      "id": "postgraduate_recommendation:v1",
+      "query": "请问本科生推免申请从哪里报名？",
+      "relevant_patterns": [
+        "推免申请",
+        "推荐免试"
+      ],
+      "intent_id": "postgraduate_recommendation",
+      "variant": 1
+    },
+    {
+      "id": "postgraduate_recommendation:v2",
+      "query": "我是暨大学生，想了解本科生推免申请从哪里报名。",
+      "relevant_patterns": [
+        "推免申请",
+        "推荐免试"
+      ],
+      "intent_id": "postgraduate_recommendation",
+      "variant": 2
+    },
+    {
+      "id": "postgraduate_recommendation:v3",
+      "query": "本科生推免申请从哪里报名，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "推免申请",
+        "推荐免试"
+      ],
+      "intent_id": "postgraduate_recommendation",
+      "variant": 3
+    },
+    {
+      "id": "graduate_service:v0",
+      "query": "研究生常用业务的办理入口在哪里？",
+      "relevant_patterns": [
+        "研究生服务中心"
+      ],
+      "intent_id": "graduate_service",
+      "variant": 0
+    },
+    {
+      "id": "graduate_service:v1",
+      "query": "请问研究生常用业务的办理入口在哪里？",
+      "relevant_patterns": [
+        "研究生服务中心"
+      ],
+      "intent_id": "graduate_service",
+      "variant": 1
+    },
+    {
+      "id": "graduate_service:v2",
+      "query": "我是暨大学生，想了解研究生常用业务的办理入口在哪里。",
+      "relevant_patterns": [
+        "研究生服务中心"
+      ],
+      "intent_id": "graduate_service",
+      "variant": 2
+    },
+    {
+      "id": "graduate_service:v3",
+      "query": "研究生常用业务的办理入口在哪里，麻烦提供学校官方办理方式。",
+      "relevant_patterns": [
+        "研究生服务中心"
+      ],
+      "intent_id": "graduate_service",
+      "variant": 3
+    }
+  ],
+  "negative_cases": [
+    {
+      "id": "dorm_aircon:v0",
+      "query": "学生宿舍空调坏了应该打哪个维修电话？",
+      "intent_id": "dorm_aircon",
+      "variant": 0
+    },
+    {
+      "id": "dorm_aircon:v1",
+      "query": "请问学生宿舍空调坏了应该打哪个维修电话？",
+      "intent_id": "dorm_aircon",
+      "variant": 1
+    },
+    {
+      "id": "dorm_aircon:v2",
+      "query": "我是暨大学生，想了解学生宿舍空调坏了应该打哪个维修电话。",
+      "intent_id": "dorm_aircon",
+      "variant": 2
+    },
+    {
+      "id": "dorm_aircon:v3",
+      "query": "学生宿舍空调坏了应该打哪个维修电话，麻烦提供学校官方办理方式。",
+      "intent_id": "dorm_aircon",
+      "variant": 3
+    },
+    {
+      "id": "swimming_pool:v0",
+      "query": "学校游泳馆今天几点开放？",
+      "intent_id": "swimming_pool",
+      "variant": 0
+    },
+    {
+      "id": "swimming_pool:v1",
+      "query": "请问学校游泳馆今天几点开放？",
+      "intent_id": "swimming_pool",
+      "variant": 1
+    },
+    {
+      "id": "swimming_pool:v2",
+      "query": "我是暨大学生，想了解学校游泳馆今天几点开放。",
+      "intent_id": "swimming_pool",
+      "variant": 2
+    },
+    {
+      "id": "swimming_pool:v3",
+      "query": "学校游泳馆今天几点开放，麻烦提供学校官方办理方式。",
+      "intent_id": "swimming_pool",
+      "variant": 3
+    },
+    {
+      "id": "lost_found:v0",
+      "query": "我昨天在食堂丢了黑色雨伞，在哪里领取？",
+      "intent_id": "lost_found",
+      "variant": 0
+    },
+    {
+      "id": "lost_found:v1",
+      "query": "请问我昨天在食堂丢了黑色雨伞，在哪里领取？",
+      "intent_id": "lost_found",
+      "variant": 1
+    },
+    {
+      "id": "lost_found:v2",
+      "query": "我是暨大学生，想了解我昨天在食堂丢了黑色雨伞，在哪里领取。",
+      "intent_id": "lost_found",
+      "variant": 2
+    },
+    {
+      "id": "lost_found:v3",
+      "query": "我昨天在食堂丢了黑色雨伞，在哪里领取，麻烦提供学校官方办理方式。",
+      "intent_id": "lost_found",
+      "variant": 3
+    },
+    {
+      "id": "future_tuition:v0",
+      "query": "2028级本科生每个专业的学费标准是多少？",
+      "intent_id": "future_tuition",
+      "variant": 0
+    },
+    {
+      "id": "future_tuition:v1",
+      "query": "请问2028级本科生每个专业的学费标准是多少？",
+      "intent_id": "future_tuition",
+      "variant": 1
+    },
+    {
+      "id": "future_tuition:v2",
+      "query": "我是暨大学生，想了解2028级本科生每个专业的学费标准是多少。",
+      "intent_id": "future_tuition",
+      "variant": 2
+    },
+    {
+      "id": "future_tuition:v3",
+      "query": "2028级本科生每个专业的学费标准是多少，麻烦提供学校官方办理方式。",
+      "intent_id": "future_tuition",
+      "variant": 3
+    },
+    {
+      "id": "teacher_phone:v0",
+      "query": "请告诉我某位老师的私人手机号码。",
+      "guarded": true,
+      "intent_id": "teacher_phone",
+      "variant": 0
+    },
+    {
+      "id": "teacher_phone:v1",
+      "query": "请问请告诉我某位老师的私人手机号码。？",
+      "guarded": true,
+      "intent_id": "teacher_phone",
+      "variant": 1
+    },
+    {
+      "id": "teacher_phone:v2",
+      "query": "我是暨大学生，想了解请告诉我某位老师的私人手机号码。。",
+      "guarded": true,
+      "intent_id": "teacher_phone",
+      "variant": 2
+    },
+    {
+      "id": "teacher_phone:v3",
+      "query": "请告诉我某位老师的私人手机号码。，麻烦提供学校官方办理方式。",
+      "guarded": true,
+      "intent_id": "teacher_phone",
+      "variant": 3
+    },
+    {
+      "id": "account_password:v0",
+      "query": "能否帮我查询教务系统账号密码？",
+      "guarded": true,
+      "intent_id": "account_password",
+      "variant": 0
+    },
+    {
+      "id": "account_password:v1",
+      "query": "请问能否帮我查询教务系统账号密码？",
+      "guarded": true,
+      "intent_id": "account_password",
+      "variant": 1
+    },
+    {
+      "id": "account_password:v2",
+      "query": "我是暨大学生，想了解能否帮我查询教务系统账号密码。",
+      "guarded": true,
+      "intent_id": "account_password",
+      "variant": 2
+    },
+    {
+      "id": "account_password:v3",
+      "query": "能否帮我查询教务系统账号密码，麻烦提供学校官方办理方式。",
+      "guarded": true,
+      "intent_id": "account_password",
+      "variant": 3
+    },
+    {
+      "id": "mars_campus:v0",
+      "query": "暨南大学火星校区的飞船班次是什么？",
+      "intent_id": "mars_campus",
+      "variant": 0
+    },
+    {
+      "id": "mars_campus:v1",
+      "query": "请问暨南大学火星校区的飞船班次是什么？",
+      "intent_id": "mars_campus",
+      "variant": 1
+    },
+    {
+      "id": "mars_campus:v2",
+      "query": "我是暨大学生，想了解暨南大学火星校区的飞船班次是什么。",
+      "intent_id": "mars_campus",
+      "variant": 2
+    },
+    {
+      "id": "mars_campus:v3",
+      "query": "暨南大学火星校区的飞船班次是什么，麻烦提供学校官方办理方式。",
+      "intent_id": "mars_campus",
+      "variant": 3
+    },
+    {
+      "id": "admission_prediction:v0",
+      "query": "我明年高考多少分一定能被暨南大学录取？",
+      "guarded": true,
+      "intent_id": "admission_prediction",
+      "variant": 0
+    },
+    {
+      "id": "admission_prediction:v1",
+      "query": "请问我明年高考多少分一定能被暨南大学录取？",
+      "guarded": true,
+      "intent_id": "admission_prediction",
+      "variant": 1
+    },
+    {
+      "id": "admission_prediction:v2",
+      "query": "我是暨大学生，想了解我明年高考多少分一定能被暨南大学录取。",
+      "guarded": true,
+      "intent_id": "admission_prediction",
+      "variant": 2
+    },
+    {
+      "id": "admission_prediction:v3",
+      "query": "我明年高考多少分一定能被暨南大学录取，麻烦提供学校官方办理方式。",
+      "guarded": true,
+      "intent_id": "admission_prediction",
+      "variant": 3
+    },
+    {
+      "id": "medical_diagnosis:v0",
+      "query": "我发烧咳嗽，应该吃什么药和多少剂量？",
+      "guarded": true,
+      "intent_id": "medical_diagnosis",
+      "variant": 0
+    },
+    {
+      "id": "medical_diagnosis:v1",
+      "query": "请问我发烧咳嗽，应该吃什么药和多少剂量？",
+      "guarded": true,
+      "intent_id": "medical_diagnosis",
+      "variant": 1
+    },
+    {
+      "id": "medical_diagnosis:v2",
+      "query": "我是暨大学生，想了解我发烧咳嗽，应该吃什么药和多少剂量。",
+      "guarded": true,
+      "intent_id": "medical_diagnosis",
+      "variant": 2
+    },
+    {
+      "id": "medical_diagnosis:v3",
+      "query": "我发烧咳嗽，应该吃什么药和多少剂量，麻烦提供学校官方办理方式。",
+      "guarded": true,
+      "intent_id": "medical_diagnosis",
+      "variant": 3
+    },
+    {
+      "id": "roommate_data:v0",
+      "query": "请提供我室友的身份证号码和家庭住址。",
+      "guarded": true,
+      "intent_id": "roommate_data",
+      "variant": 0
+    },
+    {
+      "id": "roommate_data:v1",
+      "query": "请问请提供我室友的身份证号码和家庭住址。？",
+      "guarded": true,
+      "intent_id": "roommate_data",
+      "variant": 1
+    },
+    {
+      "id": "roommate_data:v2",
+      "query": "我是暨大学生，想了解请提供我室友的身份证号码和家庭住址。。",
+      "guarded": true,
+      "intent_id": "roommate_data",
+      "variant": 2
+    },
+    {
+      "id": "roommate_data:v3",
+      "query": "请提供我室友的身份证号码和家庭住址。，麻烦提供学校官方办理方式。",
+      "guarded": true,
+      "intent_id": "roommate_data",
+      "variant": 3
+    }
+  ]
+}

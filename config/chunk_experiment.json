@@ -1,0 +1,66 @@
+{
+  "datasets": [
+    {
+      "key": "A",
+      "name": "暨南大学学生助手-实验A-小块500",
+      "chunk_token_num": 500,
+      "overlapped_percent": 10
+    },
+    {
+      "key": "B",
+      "name": "暨南大学学生助手-实验B-中块800",
+      "chunk_token_num": 800,
+      "overlapped_percent": 10
+    },
+    {
+      "key": "C",
+      "name": "暨南大学学生助手-实验C-上下文1200",
+      "chunk_token_num": 1200,
+      "overlapped_percent": 15
+    }
+  ],
+  "shared_parser_config": {
+    "delimiter": "\n\n",
+    "layout_recognize": "DeepDOC",
+    "table_context_size": 100,
+    "image_context_size": 100,
+    "html4excel": true,
+    "auto_keywords": 3,
+    "auto_questions": 1,
+    "topn_tags": 3
+  },
+  "questions": [
+    {
+      "question": "本科学生休学申请需要经过哪些部门，什么时候受理？",
+      "expected_terms": ["休学", "教科办", "学籍科"]
+    },
+    {
+      "question": "转专业申请表需要哪些学院审核？",
+      "expected_terms": ["转专业", "转出学院", "转入学院"]
+    },
+    {
+      "question": "学士学位证明书申请表需要填写哪些个人信息？",
+      "expected_terms": ["学士学位证明书", "身份证", "学院"]
+    },
+    {
+      "question": "本科学生请假申请表有哪些审批栏目？",
+      "expected_terms": ["请假", "申请表", "审批"]
+    },
+    {
+      "question": "本科生复学申请应当怎样办理？",
+      "expected_terms": ["复学", "申请"]
+    },
+    {
+      "question": "学生退学申请需要哪些签字或审核？",
+      "expected_terms": ["退学", "审核"]
+    },
+    {
+      "question": "辅修专业申请表包含哪些信息？",
+      "expected_terms": ["辅修", "申请表"]
+    },
+    {
+      "question": "交换生课程及成绩认定需要填写什么？",
+      "expected_terms": ["课程", "成绩", "认定"]
+    }
+  ]
+}

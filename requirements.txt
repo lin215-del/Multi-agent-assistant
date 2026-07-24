@@ -1,0 +1,7 @@
+beautifulsoup4==4.12.3
+requests==2.32.3
+Pillow==12.2.0
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+python-multipart==0.0.20
+langgraph==0.6.7

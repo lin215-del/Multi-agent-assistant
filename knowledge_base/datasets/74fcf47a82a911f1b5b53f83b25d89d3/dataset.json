@@ -1,0 +1,58 @@
+{
+  "id": "74fcf47a82a911f1b5b53f83b25d89d3",
+  "name": "暨南大学学生助手-核心服务卡片",
+  "description": "暨南大学学生高频办事材料、表格模板和来源链接，用于第一阶段稳定问答演示。",
+  "document_count": 34,
+  "chunk_count": 47,
+  "embedding_model": "BAAI/bge-m3@default1@OpenAI-API-Compatible",
+  "chunk_method": "naive",
+  "parser_config": {
+    "auto_keywords": 0,
+    "auto_questions": 0,
+    "children_delimiter": "",
+    "chunk_token_num": 512,
+    "delimiter": "\n",
+    "graphrag": {
+      "batch_chunk_token_size": 4096,
+      "build_subgraph_min_timeout_seconds": 600,
+      "build_subgraph_timeout_per_chunk_seconds": 300,
+      "community_timeout_seconds": 1800,
+      "entity_types": [
+        "organization",
+        "person",
+        "geo",
+        "event",
+        "category"
+      ],
+      "lock_acquire_timeout_seconds": 600,
+      "merge_timeout_seconds": 180,
+      "method": "light",
+      "resolution_timeout_seconds": 1800,
+      "retry_attempts": 2,
+      "retry_backoff_max_seconds": 60.0,
+      "retry_backoff_seconds": 2.0,
+      "use_graphrag": true
+    },
+    "html4excel": false,
+    "image_context_size": 0,
+    "layout_recognize": "DeepDOC",
+    "llm_id": "Qwen/Qwen2.5-7B-Instruct@default1@OpenAI-API-Compatible",
+    "parent_child": {
+      "children_delimiter": "\n",
+      "use_parent_child": false
+    },
+    "raptor": {
+      "max_cluster": 64,
+      "max_token": 256,
+      "prompt": "Please summarize the following paragraphs. Be careful with the numbers, do not make things up. Paragraphs as following:\n      {cluster_content}\nThe above is the content you need to summarize.",
+      "random_seed": 0,
+      "threshold": 0.1,
+      "use_raptor": true
+    },
+    "table_context_size": 0,
+    "topn_tags": 3
+  },
+  "pipeline_id": null,
+  "create_date": "2026-07-18T21:06:14",
+  "update_date": "2026-07-19T12:15:30"
+}

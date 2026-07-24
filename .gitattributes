@@ -1,0 +1,5 @@
+knowledge_base/blobs/** binary
+knowledge_base/datasets/** -text
+knowledge_base/README.md -text
+knowledge_base/manifest.json -text
+knowledge_base/SHA256SUMS.txt -text
